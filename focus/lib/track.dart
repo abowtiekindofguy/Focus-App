@@ -8,6 +8,19 @@ import 'login.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
+
+
+
+Map<String, dynamic> appUsageInfoToMap(AppUsageInfo info) {
+  return {
+    'appName': info.appName,
+    'packageName': info.packageName,
+    'usageMinutes': info.usage.inMinutes, // Assuming `usage` is a Duration object
+  };
+}
+
+
+
 class TrackPage extends StatefulWidget {
   const TrackPage({Key? key}) : super(key: key);
 
@@ -18,19 +31,23 @@ class TrackPage extends StatefulWidget {
 class _TrackPageState extends State<TrackPage> {
   List<AppUsageInfo> info = [];
   @override
-  void initState() {
+  void initState(){
     super.initState();
-    getUsageStats();
-    // uploadUsageStats();
+    initAsync();
   }
 
-  // Future<void> uploadUsageStats() async {
-  //   String email = await Authentication.getEmail();
-  //   String currentDate = DateTime.now().toString();
-  //   String metadata = 'usage-$email-$currentDate';
-  //   print(info);
-  //   FirebaseDatabase().uploadData(metadata, info);
-  // }
+  Future<void> initAsync() async {
+    await getUsageStats();
+    uploadUsageStats();
+  }
+
+  Future<void> uploadUsageStats() async {
+    String metadata = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    print(info);
+    List<Map<String, dynamic>> infoListMapped = info.map((appUsageInfo) => appUsageInfoToMap(appUsageInfo)).toList();
+    String jsonEncodedData = jsonEncode(infoListMapped);
+    FirebaseDatabase().uploadData("usage",metadata, jsonEncodedData);
+  }
 
   Future<void> getUsageStats() async {
     try {
@@ -40,9 +57,7 @@ class _TrackPageState extends State<TrackPage> {
       setState (() {
         infoList.sort((a, b) => b.usage.inMinutes.compareTo(a.usage.inMinutes));
         info = infoList;
-    String metadata = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    print(info);
-    FirebaseDatabase().uploadData("usage",metadata, info);
+    
       });
     } on AppUsageException catch (exception) {
       print(exception);

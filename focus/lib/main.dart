@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:focus/firebase_options.dart';
+import 'friends.dart';
 import 'login.dart';
 import 'track.dart';
-
+import 'map.dart';
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  String email = await Authentication.getEmail();
   runApp(
     MaterialApp(
       initialRoute: '/',
@@ -17,6 +19,9 @@ Future<void> main() async{
         '/home': (context) =>  HomeScreen(),
         '/register': (context) => RegisterPage(),
        '/track': (context) => TrackPage(),
+       '/friends': (context) => FriendsPage(currentUserId: email),
+       '/friendrequests': (context) => FriendRequestsPage(currentUserId: email),
+       '/map':(context) => MapPage(),
       },
     ),
   );
@@ -59,6 +64,24 @@ class HomeScreen extends StatelessWidget {
                 Navigator.pushNamed(context, '/track');
               },
               child:  Text('Track'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/friends');
+              },
+              child:  Text('Friends'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/friendrequests');
+              },
+              child:  Text('Friend Requests'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/map');
+              },
+              child:  Text('Map'),
             ),
           ],
         ),

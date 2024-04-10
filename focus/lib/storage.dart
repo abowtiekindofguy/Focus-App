@@ -13,14 +13,13 @@ import 'package:intl/intl.dart';
 
 class FirebaseDatabase{
   Future<void> uploadData(String folder, String metadata, dynamic data) async {
-  String jsonData = jsonEncode(data);
   String email = await Authentication.getEmail();
   // String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
   // String email = await Authentication.getEmail();
   String fileName = '$folder/$email-$metadata.json';
   Reference ref = FirebaseStorage.instance.ref().child(fileName);
   try {
-    await ref.putString(jsonData);
+    await ref.putString(data);
     print("Upload successful");
   } catch (e) {
     print("Error uploading file: $e");
