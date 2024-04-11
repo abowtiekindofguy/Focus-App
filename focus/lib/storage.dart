@@ -13,7 +13,11 @@ import 'package:intl/intl.dart';
 
 class FirebaseDatabase{
   Future<void> uploadData(String folder, String metadata, dynamic data) async {
-  String email = await Authentication.getEmail();
+  print("Uploading data: $data");
+  //  String email = await Authentication.getEmail();
+  String email = "hi";
+  print("Uploading data: $data");
+  print(email);
   // String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
   // String email = await Authentication.getEmail();
   String fileName = '$folder/$email-$metadata.json';
