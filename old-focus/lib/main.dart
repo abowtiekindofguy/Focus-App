@@ -6,21 +6,7 @@ import 'friends.dart';
 import 'login.dart';
 import 'track.dart';
 import 'map.dart';
-import 'package:flutter/services.dart'; 
-import 'dart:async';
-import 'dart:isolate';
-import 'package:intl/intl.dart';
-import 'storage.dart';
-
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'login.dart';
-import 'track.dart';
-import 'firebase_options.dart';
-import 'dart:convert';
-import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';  // Required for MethodChannel and PlatformException
 
 
 Future<void> main() async{
@@ -44,101 +30,19 @@ Future<void> main() async{
 }
 
 
+
 class HomeScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      home: MyHomePage(),
-    );
-  }
-}
+    const HomeScreen({Key? key}) : super(key: key);
+    static const platform = MethodChannel('com.example.focus/LocationService');
 
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-} 
-
-
-class _MyHomePageState extends State<MyHomePage> {
-    // const MyHomePage({Key? key}) : super(key: key);
-
-  // Future<void> _startService() async {
-  //   print("Starting service shayd");
-  //   try {
-  //     await platform.invokeMethod('startForegroundService');
-  //   } on PlatformException catch (e) {
-  //     print("Failed to invoke method: '${e.message}'");
-  //   }
-  // }
-
-  late Isolate isolate;
-  late ReceivePort receivePort;
-  bool isIsolateRunning = false;
-
-  @override
-  void initState() {
-    super.initState();
-    startIsolate();
-  }
-
-  void startIsolate() async {
-    receivePort = ReceivePort();
-    isolate = await Isolate.spawn(uploadDataEntryPoint, receivePort.sendPort);
-    isIsolateRunning = true;
-    receivePort.listen((message) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message.toString())),
-      );
-    });
-  }
-
-  static void uploadDataEntryPoint(SendPort sendPort) async {
-    ReceivePort port = ReceivePort();
-    sendPort.send(port.sendPort);
-
-    // Set up periodic timer to upload data every 5 minutes
-    Timer.periodic(Duration(minutes: 1), (Timer timer) async {
-      try {
-        FirebaseDatabase db = FirebaseDatabase();
-        await db.uploadData("testFolder", "testMetadata", ("{'time': DateTime.now().toString()}"));
-        port.sendPort.send("Data uploaded successfully");
-      } catch (e) {
-        port.sendPort.send("Failed to upload data: $e");
-      }
-    });
-  }
-
-  void stopIsolate() {
-    if (isIsolateRunning) {
-      receivePort.close();
-      isolate.kill(priority: Isolate.immediate);
-      setState(() {
-        isIsolateRunning = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Isolate has been stopped')),
-      );
+  Future<void> _startService() async {
+    print("Starting service shayd");
+    try {
+      await platform.invokeMethod('startForegroundService');
+    } on PlatformException catch (e) {
+      print("Failed to invoke method: '${e.message}'");
     }
   }
-
-
-
-
-
-   @override
-  void dispose() {
-    if (isIsolateRunning) {
-      stopIsolate();  // Ensure the isolate is stopped when the widget is disposed
-    }
-    super.dispose();
-  }
-  
-
-
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,8 +67,9 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text('Register'),
             ),
             ElevatedButton(
-              onPressed: isIsolateRunning ? stopIsolate : null,
-              child: Text('Stop Isolate'),
+              onPressed: () {
+                _startService();              },
+              child:  Text('Start'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -196,60 +101,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-// class FirebaseDatabase {
-//   Future<void> uploadData(String folder, String metadata, dynamic data) async {
-//     String fileName = '$folder/$metadata.json';
-//     Reference ref = FirebaseStorage.instance.ref().child(fileName);
-//     try {
-//       await ref.putString(data);
-//       print("Upload successful");
-//     } catch (e) {
-//       print("Error uploading file: $e");
-//       throw e;  // Rethrowing the exception to the caller
-//     }
-//   }
-
-//   Future<String> downloadData(String folder, String metadata) async {
-//     String fileName = '$folder/$metadata.json';
-//     try {
-//       Reference ref = FirebaseStorage.instance.ref().child(fileName);
-//       const maxSize = 10 * 1024 * 1024;  // 10 MB max file size
-//       final bytes = await ref.getData(maxSize);
-//       final stringData = String.fromCharCodes(bytes!);
-//       return stringData;
-//     } catch (e) {
-//       print("Error downloading file: $e");
-//       throw e;
-//     }
-//   }
-
-//   Future<void> deleteData(String metadata) async {
-//     String fileName = '$metadata.json';
-//     try {
-//       Reference ref = FirebaseStorage.instance.ref().child(fileName);
-//       await ref.delete();
-//       print("Delete successful");
-//     } catch (e) {
-//       print("Error deleting file: $e");
-//       throw e;
-//     }
-//   }
-
-//   Future<String> getDownloadURL(String metadata) async {
-//     String fileName = '$metadata.json';
-//     try {
-//       Reference ref = FirebaseStorage.instance.ref().child(fileName);
-//       String downloadURL = await ref.getDownloadURL();
-//       return downloadURL;
-//     } catch (e) {
-//       print("Error getting download URL: $e");
-//       throw e;
-//     }
-//   }
-// }
-
-
 
 // class HomeScreen extends StatelessWidget {
 //   const HomeScreen({super.key});
