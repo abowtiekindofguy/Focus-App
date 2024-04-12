@@ -15,36 +15,119 @@ import 'track.dart';
 import 'firebase_options.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'validator.dart';
 
+class InviteFriendPage extends StatelessWidget {
+  final String currentUserId;
+  final TextEditingController emailController = TextEditingController();
+
+  InviteFriendPage({required this.currentUserId});
+
+  @override
+  Widget build(BuildContext context) {
+    final usersRef = FirebaseFirestore.instance.collection('users');
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Invite Friends'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+        TextFormField(
+          controller: emailController,
+          validator: (value) => Validator.validateEmail(
+                          email: value,
+                        ),
+          decoration: InputDecoration(
+            labelText: 'Enter your friend\'s email',
+            suffixIcon: IconButton(
+          icon: Icon(Icons.send),
+          onPressed: () {
+            if (emailController.text.isNotEmpty) {
+              sendFriendRequest(emailController.text, currentUserId);
+              emailController.clear(); // Clear the text field after sending request
+            }
+          },
+            ),
+          ),
+          keyboardType: TextInputType.emailAddress,
+        ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> sendFriendRequest(String receiverId, String senderId) async {
+    await FirebaseFirestore.instance.collection('friendRequests').add({
+      'senderId': senderId,
+      'receiverId': receiverId,  // Typo corrected from 'recieverId' to 'receiverId'
+      'status': 'pending',
+    });
+    //when the friend request is sent, user will receive a local notification
+              FlutterLocalNotificationsPlugin flip = FlutterLocalNotificationsPlugin();
+
+    var androidDetails = const AndroidNotificationDetails(
+                'channel_id', 'Friend Request Sent',
+                importance: Importance.max, priority: Priority.high, ticker: 'ticker');
+              var platformDetails = NotificationDetails(android: androidDetails);
+              await flip.show(0, 'Focus Friend Request Sent', 'Friend Request Sent to '+receiverId+"\nYour Friend List would be updated once the request is accepted", platformDetails);
+
+
+  }
+}
+
+
+// class InviteFriendPage extends StatelessWidget {
+//   final String currentUserId;
+//   InviteFriendPage({required this.currentUserId});
+//   @override
+//   Widget build(BuildContext context) {
+//     final usersRef = FirebaseFirestore.instance.collection('users');
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Invite Friends'),
+//       ),
+//       body: StreamBuilder<QuerySnapshot>(
+//         stream: usersRef.snapshots(),
+//         builder: (context, snapshot) {
+//           if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+//           List<DocumentSnapshot> users = snapshot.data!.docs;
+//           return ListView.builder(
+//             itemCount: users.length,
+//             itemBuilder: (context, index) {
+//               var user = users[index];
+//               if (user.id == currentUserId) return Container();
+//               return ListTile(
+//                 title: Text(user['name']),
+//                 subtitle: Text(user['email'] ?? 'No email'), // Use null-aware operator to handle possible null value
+//                 trailing: ElevatedButton(
+//                   onPressed: () => sendFriendRequest(user.id, currentUserId),
+//                   child: Text('Invite'),
+//                 ),
+//               );
+//             },
+//           );
+//         },
+//       ),
+//     );
+//   }
+
+//   Future<void> sendFriendRequest(String receiverId, String senderId) async {
+//     await FirebaseFirestore.instance.collection('friendRequests').add({
+//       'senderId': senderId,
+//       'recieverId': receiverId,
+//       'status': 'pending',
+//     });
+//   }
+// }
 class FriendsPage extends StatelessWidget {
   final String currentUserId;
 
   FriendsPage({required this.currentUserId});
 
-  // @override
-  //   Widget build(BuildContext context) {
-  //     final friendsRef = FirebaseFirestore.instance.collection('users').doc(currentUserId);
-      
-  //     return StreamBuilder<DocumentSnapshot>(
-  //       stream: friendsRef.snapshots(),
-  //       builder: (context, snapshot) {
-  //         if (!snapshot.hasData) return CircularProgressIndicator();
-
-  //         Map<String, dynamic> friendsMap = snapshot.data!.data()?.['friends'] as Map<String, dynamic>;
-  //         List<String> friends = friendsMap.keys.toList();
-
-  //         return ListView.builder(
-  //           itemCount: friends.length,
-  //           itemBuilder: (context, index) {
-  //             String friendUserId = friends[index];        
-  //             return ListTile(
-  //               title: Text("Friend ID: $friendUserId"),
-  //             );
-  //           },
-  //         );
-  //       },
-  //     );
-  //   }
 
   @override
 Widget build(BuildContext context) {
@@ -82,11 +165,21 @@ Widget build(BuildContext context) {
             },
           ),
         ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pushNamed(context, '/friendrequests'); // Ensure this route is defined in your MaterialApp routes
-          },
-          child: Text('Friend Requests'),
+        Row(
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/friendrequests'); // Ensure this route is defined in your MaterialApp routes
+              },
+              child: Text('Friend Requests'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/inviteFriend'); // Ensure this route is defined in your MaterialApp routes
+              },
+              child: Text('Invite Friends'),
+            ),
+          ],
         ),
       ],
     ),

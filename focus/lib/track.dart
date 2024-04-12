@@ -64,25 +64,74 @@ class _TrackPageState extends State<TrackPage> {
     }
   }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: Text('Track Page'),
+  //     ),
+  //     body: 
+  //     ListView.builder(
+  //       itemCount: info.length,
+  //       itemBuilder: (context, index) {
+  //         return ListTile(
+  //           title: Text(info[index].appName),
+  //           subtitle: Text(info[index].packageName),
+  //           trailing: Text(info[index].usage.inMinutes.toString() + ' minutes'),
+  //         );
+  //       },
+  //     ),
+
+      
+  //   );
+  // }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Track Page'),
+        title: Text("Dashboard"),
+        // backgroundColor: Colors.black,
+        actions: [
+          // Add action buttons if needed
+        ],
       ),
-      body: 
-      ListView.builder(
-        itemCount: info.length,
-        itemBuilder: (context, index) {
-          return ListTile(
+      backgroundColor: Colors.black,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Screen time',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+            // Add your bar chart widget here
+            // You can use a package like fl_chart or charts_flutter to render charts
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                '3 hr, 8 min',
+                style: TextStyle(color: Colors.white, fontSize: 36),
+              ),
+            ),
+            // Create a list view for the apps list
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: 5, // the number of items in your list
+              itemBuilder: (context, index) {
+                return ListTile(
             title: Text(info[index].appName),
             subtitle: Text(info[index].packageName),
             trailing: Text(info[index].usage.inMinutes.toString() + ' minutes'),
           );
-        },
+              },
+            ),
+          ],
+        ),
       ),
-
-      
     );
   }
 }

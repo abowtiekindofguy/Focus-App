@@ -13,7 +13,7 @@ import 'dart:async';
 import 'dart:isolate';
 import 'package:intl/intl.dart';
 import 'storage.dart';
-
+import 'dart:async';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -25,12 +25,89 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'main_chuck.dart';
+import 'package:flutter_isolate/flutter_isolate.dart';
+import 'package:app_usage/app_usage.dart';
+import 'package:workmanager/workmanager.dart';
 
+const fetchBackground = "fetchBackground";
+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    switch (task) {
+      case fetchBackground:
+        try {
+          // Initialize Notification Plugin
+          FlutterLocalNotificationsPlugin flip = FlutterLocalNotificationsPlugin();
+          var android = AndroidInitializationSettings('@mipmap/ic_launcher');
+          var settings = InitializationSettings(android: android);
+          await flip.initialize(settings);
+
+          // Check App Usage
+          AppUsage appUsage = AppUsage();
+          try {
+            DateTime endDate = DateTime.now();
+            DateTime startDate = endDate.subtract(Duration(hours: 1)); // check last hour usage
+            List<AppUsageInfo> infoList = await appUsage.getAppUsage(startDate, endDate);
+            bool isYouTubeActive = infoList.any((info) => info.packageName.contains('com.google.android.youtube') && info.usage.inMinutes > 1);
+            
+            if (isYouTubeActive) {
+              // Send Notification if YouTube was active in the last hour
+              var androidDetails = const AndroidNotificationDetails(
+                'channel_id', 'YouTube Notification',
+                importance: Importance.max, priority: Priority.high, ticker: 'ticker');
+              var platformDetails = NotificationDetails(android: androidDetails);
+              await flip.show(0, 'YouTube Checker', 'YouTube is active in the last hour!', platformDetails);
+            }
+          } catch (e) {
+            print("Error fetching app usage: $e");
+          }
+        } catch (e) {
+          print("Failed to send notification: $e");
+        }
+        break;
+    }
+    return Future.value(true); // Return true to indicate task completion
+  });
+}
+
+
+// const fetchBackground = "fetchBackground";
+
+// void callbackDispatcher() {
+//   Workmanager().executeTask((task, inputData) async {
+//     switch (task) {
+//       case fetchBackground:
+//         FlutterLocalNotificationsPlugin flip = new FlutterLocalNotificationsPlugin();
+//         var android = new AndroidInitializationSettings('@mipmap/ic_launcher');
+//         var settings = new InitializationSettings(android: android);
+//         flip.initialize(settings);
+//         var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+//             'your channel id', 'your channel name',
+//             importance: Importance.max, priority: Priority.high, ticker: 'ticker');
+//         var platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+//         await flip.show(0, 'YouTube Checker', 'YouTube is active!', platformChannelSpecifics);
+//         break;
+//     }
+//     return Future.value(true);
+//   });
+// }
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   String email = await Authentication.getEmail();
+  Workmanager().initialize(
+    callbackDispatcher, // The top-level function, aka callbackDispatcher
+    isInDebugMode: true // If true, enables debugging to ensure it works correctly
+  );
+  Workmanager().registerPeriodicTask(
+    "1",
+    fetchBackground,
+    frequency: Duration(seconds: 15), // defines the frequency in which your task should be called
+    constraints: Constraints(
+      networkType: NetworkType.connected,
+    ),
+  );
   runApp(
     MaterialApp(
       initialRoute: '/',
@@ -44,6 +121,7 @@ Future<void> main() async{
        '/map':(context) => MapPage(),
        '/sudoku':(context) => SudokuPage(),
        '/game':(context) => GameScreen(),
+       '/inviteFriend' : (context) => InviteFriendPage(currentUserId: email),
       },
     ),
   );
@@ -55,60 +133,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Isolate isolate;
-  late ReceivePort receivePort;
-  bool isIsolateRunning = false;
+  late FlutterLocalNotificationsPlugin _notificationsPlugin;
 
   @override
   void initState() {
     super.initState();
-    // initializeNotifications();
-    // startIsolate();
-  }
-
-
-
-
-  void startIsolate() async {
-    receivePort = ReceivePort();
-    isolate = await Isolate.spawn(uploadDataEntryPoint, receivePort.sendPort);
-    isIsolateRunning = true;
-    receivePort.listen((data) {
-      if (data is String) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data)),
-        );
-      }
-    });
-  }
-
-  static void uploadDataEntryPoint(SendPort sendPort) async {
-  ReceivePort port = ReceivePort();
-  sendPort.send(port.sendPort);
-
-  Timer.periodic(Duration(seconds: 10), (Timer timer) async {
-    try {
-      print("Uploading data____>>>>>>");
-
-      print("Data uploaded successfully");
-      sendPort.send("Data uploaded successfully");
-    } catch (e) {
-      sendPort.send("Failed to upload data: $e");
-    }
-  });
-}
-
-  void stopIsolate() {
-    if (isIsolateRunning) {
-      receivePort.close();
-      isolate.kill(priority: Isolate.immediate);
-      setState(() {
-        isIsolateRunning = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Isolate has been stopped')),
-      );
-    }
   }
 
 
@@ -131,10 +160,15 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => Navigator.pushNamed(context, '/register'),
             child: Text('Register'),
           ),
-          ElevatedButton(
-            onPressed: isIsolateRunning ? stopIsolate : null,
-            child: Text('Stop Background Task'),
-          ),
+          // ElevatedButton(
+          //   onPressed: () {
+          //   BackgroundFetch.start().then((int status) {
+          //     print('Background fetch service started with status: $status');
+          //   }).catchError((e) {
+          //     print('Error starting background fetch service: $e');
+          //   });},
+          //   child: Text('Background Task'),
+          // ),
           ElevatedButton(
             onPressed: () => Navigator.pushNamed(context, '/track'),
             child: Text('Track'),
@@ -165,6 +199,19 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+//   void backgroundFetchHeadlessTask(HeadlessTask task) async {
+//   var taskId = task.taskId;
+//   if (task.timeout) {
+//     BackgroundFetch.finish(taskId);
+//     return;
+//   }
+//   print('[BackgroundFetch] Headless event received.');
+//   await _HomeScreenState()._onBackgroundFetch(taskId);
+//   BackgroundFetch.finish(taskId);
+// }
+
+
 }
 
 // import 'package:flutter/material.dart';
