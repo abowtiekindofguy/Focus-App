@@ -41,7 +41,7 @@ class InviteFriendPage extends StatelessWidget {
                           email: value,
                         ),
           decoration: InputDecoration(
-            labelText: 'Enter your friend\'s email',
+            labelText: 'Enter your friend\'s Focus ID',
             suffixIcon: IconButton(
           icon: Icon(Icons.send),
           onPressed: () {
@@ -74,7 +74,6 @@ class InviteFriendPage extends StatelessWidget {
                 importance: Importance.max, priority: Priority.high, ticker: 'ticker');
               var platformDetails = NotificationDetails(android: androidDetails);
               await flip.show(0, 'Focus Friend Request Sent', 'Friend Request Sent to '+receiverId+"\nYour Friend List would be updated once the request is accepted", platformDetails);
-
 
   }
 }

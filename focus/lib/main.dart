@@ -28,6 +28,7 @@ import 'main_chuck.dart';
 import 'package:flutter_isolate/flutter_isolate.dart';
 import 'package:app_usage/app_usage.dart';
 import 'package:workmanager/workmanager.dart';
+import 'challenge.dart';
 
 const fetchBackground = "fetchBackground";
 
@@ -71,27 +72,6 @@ void callbackDispatcher() {
 }
 
 
-// const fetchBackground = "fetchBackground";
-
-// void callbackDispatcher() {
-//   Workmanager().executeTask((task, inputData) async {
-//     switch (task) {
-//       case fetchBackground:
-//         FlutterLocalNotificationsPlugin flip = new FlutterLocalNotificationsPlugin();
-//         var android = new AndroidInitializationSettings('@mipmap/ic_launcher');
-//         var settings = new InitializationSettings(android: android);
-//         flip.initialize(settings);
-//         var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-//             'your channel id', 'your channel name',
-//             importance: Importance.max, priority: Priority.high, ticker: 'ticker');
-//         var platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-//         await flip.show(0, 'YouTube Checker', 'YouTube is active!', platformChannelSpecifics);
-//         break;
-//     }
-//     return Future.value(true);
-//   });
-// }
-
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -122,6 +102,8 @@ Future<void> main() async{
        '/sudoku':(context) => SudokuPage(),
        '/game':(context) => GameScreen(),
        '/inviteFriend' : (context) => InviteFriendPage(currentUserId: email),
+       '/challenges' : (context) => ChallengePage(currentUserId: email),
+       '/acceptedChallenges' : (context) => AcceptedChallenges(currentUserId: email),
       },
     ),
   );
@@ -192,6 +174,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ElevatedButton(
             onPressed: () => Navigator.pushNamed(context, '/game'),
             child: Text('Chuck Jump'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pushNamed(context, '/inviteFriend'),
+            child: Text('Invite Friends'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pushNamed(context, '/challenges'),
+            child: Text('Challenges'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pushNamed(context, '/acceptedChallenges'),
+            child: Text('Accepted Challenges'),
           ),
         ],
           ),
