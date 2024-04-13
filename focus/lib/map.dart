@@ -1,6 +1,9 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MapPage extends StatefulWidget {
   @override
@@ -16,44 +19,94 @@ class _MapSamplePageState extends State<MapPage> {
   }
 
   void _addMarker(double lat, double lng, String markerLoc) {
+
+
+    void _showBottomSheet(BuildContext context, Map<String, String> dataMap, String locationName) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        builder: (_, controller) => ListView.builder(
+          controller: controller,
+          itemCount: dataMap.keys.length,
+          itemBuilder: (_, index) {
+            String key = dataMap.keys.elementAt(index);
+            return ListTile(
+              title: Text(key),
+              trailing: Text('${dataMap[key]}'),
+            );
+          },
+        ),
+      ),
+    );
+  }
     final markerId = MarkerId("$lat,$lng");
+    final usersInHostel = FirebaseFirestore.instance.collection('users').where('location', isEqualTo: markerLoc).get();
+    final Map<String,String> emailList = {}; 
+    usersInHostel.then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+      final email = doc['email'];
+      final name = doc['name'];
+      emailList[name] = email;
+      });
+    }).catchError((error) {
+      // Handle error
+    });
     final marker = Marker(
       markerId: markerId,
       position: LatLng(lat, lng),
+      infoWindow: InfoWindow(title: markerLoc),
       onTap: () {
-        // Here you can fetch and show users near this marker
- showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          // Here, we are using a simple dialog to show user info. You can customize it as needed.
-          return AlertDialog(
-            title: Text("Freinds near $markerLoc"),
-            content: Text("Users close to this marker: [...]"), // Placeholder for user info
-            actions: <Widget>[
-              // Usually buttons at the bottom of the dialog
-              TextButton(
-                child: Text("Close"),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Dismiss the dialog
-                },
-              ),
-            ],
-          );
-        },
-      );      },
+        _showBottomSheet(context, emailList, markerLoc);
+      },
+//       onTap: () {
+//         // Here you can fetch and show users near this marker
+//  showDialog(
+//         context: context,
+//         builder: (BuildContext context) {
+//           // Here, we are using a simple dialog to show user info. You can customize it as needed.
+//           return AlertDialog(
+//             title: Text("Freinds near $markerLoc"),
+//             content: Text("Users close to this marker: [...]"), // Placeholder for user info
+//             actions: <Widget>[
+//               // Usually buttons at the bottom of the dialog
+//               TextButton(
+//                 child: Text("Close"),
+//                 onPressed: () {
+//                   Navigator.of(context).pop(); // Dismiss the dialog
+//                 },
+//               ),
+//             ],
+//           );
+//         },
+//       );      },
     );
 
     setState(() {
       markers[markerId] = marker;
     });
   }
+  
+  List<Map<String,List<double>>> hostelData = [
+    {
+      "Satpura": [28.5483, 77.1879]
+    },
+    {
+      "Shivalik": [28.5476, 77.1831]
+    }
+  ];
 
   @override
   void initState() {
     super.initState();
     // Example: Add a marker
-    _addMarker(28.5483, 77.1879, "Satpura");
-    _addMarker(28.5476, 77.1831, "Shivalik"); // Add more markers as needed
+    for (var hostel in hostelData) {
+      var key = hostel.keys.first;
+      var value = hostel.values.first;
+      _addMarker(value[0], value[1], key);
+    }
+    // _addMarker(28.5483, 77.1879, "Satpura");
+    // _addMarker(28.5476, 77.1831, "Shivalik"); // Add more markers as needed
   }
 
   @override

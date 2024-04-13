@@ -23,6 +23,7 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
   late final HudButtonComponent leftButton;
   late final HudButtonComponent rightButton;
   late final HudButtonComponent upButton;
+  late final HudButtonComponent boosterButton;
   Set<int> keys = {};
   int starsCollected = 0;
   int health = 5;
@@ -40,6 +41,7 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
       'button_up.png',
       'button_left.png',
       'button_right.png',
+      'button_booster.png',
     ]);
     camera.viewfinder.anchor = Anchor.topLeft;
     camera.viewport.add(Hud());
@@ -72,6 +74,16 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
       direction: 'up',
     );
     add(upButton);
+
+
+    boosterButton = createButtonComponent(
+      position: Vector2(840, 100),
+      size: Vector2.all(64),
+      onPressed: () => add_key(2),
+      onReleased: () => remove_key(2),
+      direction: 'booster',
+    );
+    add(boosterButton);
     
   }
 

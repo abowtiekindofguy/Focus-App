@@ -31,7 +31,7 @@ final segment0 = [
   Block(Vector2(3, 0), GroundBlock),
   Block(Vector2(4, 0), GroundBlock),
   Block(Vector2(5, 0), GroundBlock),
-  Block(Vector2(5, 1), LogoEnemy),
+  Block(Vector2(7, 1), LogoEnemy),
   Block(Vector2(5, 3), PlatformBlock),
   Block(Vector2(6, 0), GroundBlock),
   Block(Vector2(6, 3), PlatformBlock),

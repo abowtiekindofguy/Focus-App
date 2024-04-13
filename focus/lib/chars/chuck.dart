@@ -41,8 +41,9 @@ class ChuckPlayer extends SpriteAnimationComponent
   @override
   bool onKeyEvent(Set<int> keys) {
     horizontalDirection = 0;
-    horizontalDirection += keys.contains(-1) ? -1: 0;
-    horizontalDirection += keys.contains(1) ? 1: 0;
+    horizontalDirection += (keys.contains(-1) ? -1: 0)*(keys.contains(2) ? 3 : 1);
+    horizontalDirection += (keys.contains(1) ? 1: 0)*(keys.contains(2) ? 3 : 1);
+
     hasJumped = keys.contains(0);
     
     print(keys);

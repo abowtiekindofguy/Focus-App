@@ -22,34 +22,6 @@ import 'validator.dart';
 import 'package:localstorage/localstorage.dart';
 
 
-// class LocalChallengeManager{
-//   final LocalStorage storage = LocalStorage();
-//   final String key = 'challenges';
-//   List<Map<String, dynamic>> challenges = [];
-
-//   LocalChallengeManager(){
-//     storage.ready.then((value) {
-//       if(storage.getItem(key) != null){
-//         challenges = List<Map<String, dynamic>>.from(storage.getItem(key));
-//       }
-//     });
-//   }
-
-//   void addChallenge(Map<String, dynamic> challenge){
-//     challenges.add(challenge);
-//     storage.setItem(key, challenges);
-//   }
-
-//   void removeChallenge(int index){
-//     challenges.removeAt(index);
-//     storage.setItem(key, challenges);
-//   }
-
-//   List<Map<String, dynamic>> getChallenges(){
-//     return challenges;
-//   }
-// }
-
 List<String> packagesBlock = ['com.whatsapp','com.google.android.youtube', 'com.instagram.android'];
 
 Future<void> addChallenge(String challengeId, Map<String, dynamic> challenge) async {
@@ -81,15 +53,98 @@ Future<Map<String, dynamic>> challengeGoalsCollection() async {
   Map<String,Map<String, dynamic>> challengesCollection = Map<String,Map<String, dynamic>>.from(jsonDecode(challengesList));
   return challengesCollection;
 }
-//  Scaffold(
-//         body: SingleChildScrollView(
-//           child: Column(
-//         children: [
-//           // Your existing code here
-//         ],
-//           ),
-//         ),
-//       );
+
+Future<void> issueChallenge(String challengeName, Map<String, dynamic> challenge, String currentUserId) async {
+  await FirebaseFirestore.instance.collection('challenges').add({
+    'challenge-name': challengeName,
+    'challenge': challenge,
+    'issuer': currentUserId,
+    'status': 'open',
+  });
+   FlutterLocalNotificationsPlugin flip = FlutterLocalNotificationsPlugin();
+
+    var androidDetails = const AndroidNotificationDetails(
+                'channel_id', 'challenge Accepted',
+                importance: Importance.max, priority: Priority.high, ticker: 'ticker');
+              var platformDetails = NotificationDetails(android: androidDetails);
+              await flip.show(0, 'Challenge Issued', 'Challenge '+challengeName+" issued\nLet's start focusing!", platformDetails);
+}
+
+class IssueChallenge extends StatelessWidget {
+  final String currentUserId;
+  IssueChallenge({required this.currentUserId});
+  //only take duration in minutes give only the apps written in the packagesBlock
+  final TextEditingController _whatsappController = TextEditingController();
+  final TextEditingController _youtubeController = TextEditingController();
+  final TextEditingController _instagramController = TextEditingController();
+  final TextEditingController _challengeNameController = TextEditingController();
+  final TextEditingController _challengeDescriptionController = TextEditingController();
+  final TextEditingController _challengeDurationController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Issue Challenge'),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            TextField(
+              controller: _challengeNameController,
+              decoration: InputDecoration(
+                labelText: 'Challenge Name',
+              ),
+            ),
+            TextField(
+              controller: _challengeDescriptionController,
+              decoration: InputDecoration(
+                labelText: 'Challenge Description',
+              ),
+            ),
+            TextField(
+              controller: _challengeDurationController,
+              decoration: InputDecoration(
+                labelText: 'Challenge Duration (in minutes)',
+              ),
+            ),
+            TextField(
+              controller: _whatsappController,
+              decoration: InputDecoration(
+                labelText: 'Whatsapp Duration (in minutes)',
+              ),
+            ),
+            TextField(
+              controller: _youtubeController,
+              decoration: InputDecoration(
+                labelText: 'Youtube Duration (in minutes)',
+              ),
+            ),
+            TextField(
+              controller: _instagramController,
+              decoration: InputDecoration(
+                labelText: 'Instagram Duration (in minutes)',
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Map<String, dynamic> challenge = {
+                  'com.whatsapp': int.tryParse(_whatsappController.text) ?? 0,
+                  'com.google.android.youtube': int.tryParse(_youtubeController.text) ?? 0,
+                  'com.instagram.android': int.tryParse(_instagramController.text) ?? 0,
+                };
+                await issueChallenge(_challengeNameController.text, challenge, currentUserId);
+                Navigator.of(context).pop();
+              },
+              child: Text('Issue Challenge'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
   class AcceptedChallenges extends StatelessWidget {
     final String currentUserId;
@@ -124,26 +179,6 @@ Future<Map<String, dynamic>> challengeGoalsCollection() async {
                 );
               },
             ),
-            // const SizedBox(height: 20),
-            // const Text('Challenge Collection'),
-            // FutureBuilder<Map<String, dynamic>>(
-            //   future: challengeGoalsCollection(),
-            //   builder: (context, snapshot) {
-            //     if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-            //     Map<String, dynamic> challengesCollection = snapshot.data!;
-            //     return ListView.builder(
-            //       shrinkWrap: true,
-            //       itemCount: challengesCollection.keys.length,
-            //       itemBuilder: (context, index) {
-            //         String key = challengesCollection.keys.elementAt(index);
-            //         return ListTile(
-            //           title: Text(key),
-            //           trailing: Text('${challengesCollection[key]} minutes'),
-            //         );
-            //       },
-            //     );
-            //   },
-            // ),
           ],
         ),
         )
