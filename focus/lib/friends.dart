@@ -79,51 +79,6 @@ class InviteFriendPage extends StatelessWidget {
 
   }
 }
-
-
-// class InviteFriendPage extends StatelessWidget {
-//   final String currentUserId;
-//   InviteFriendPage({required this.currentUserId});
-//   @override
-//   Widget build(BuildContext context) {
-//     final usersRef = FirebaseFirestore.instance.collection('users');
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Invite Friends'),
-//       ),
-//       body: StreamBuilder<QuerySnapshot>(
-//         stream: usersRef.snapshots(),
-//         builder: (context, snapshot) {
-//           if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
-//           List<DocumentSnapshot> users = snapshot.data!.docs;
-//           return ListView.builder(
-//             itemCount: users.length,
-//             itemBuilder: (context, index) {
-//               var user = users[index];
-//               if (user.id == currentUserId) return Container();
-//               return ListTile(
-//                 title: Text(user['name']),
-//                 subtitle: Text(user['email'] ?? 'No email'), // Use null-aware operator to handle possible null value
-//                 trailing: ElevatedButton(
-//                   onPressed: () => sendFriendRequest(user.id, currentUserId),
-//                   child: Text('Invite'),
-//                 ),
-//               );
-//             },
-//           );
-//         },
-//       ),
-//     );
-//   }
-
-//   Future<void> sendFriendRequest(String receiverId, String senderId) async {
-//     await FirebaseFirestore.instance.collection('friendRequests').add({
-//       'senderId': senderId,
-//       'recieverId': receiverId,
-//       'status': 'pending',
-//     });
-//   }
-// }
 class FriendsPage extends StatelessWidget {
   final String currentUserId;
 

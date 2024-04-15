@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/widgets.dart';
 import 'package:focus/firebase_options.dart';
+import 'package:focus/overlays/main_menu.dart';
 import 'package:focus/sudoku.dart';
 import 'friends.dart';
 import 'login.dart';
@@ -30,11 +32,18 @@ import 'package:workmanager/workmanager.dart';
 import 'challenge.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:envied/envied.dart';
+import 'package:dart_openai/dart_openai.dart';
+import 'ai.dart';
+import 'profile_page.dart';
+import 'widgets/buttons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 const checkAppUsage = "checkAppUsage";
 const fetchParentalControl = "fetchParentalControl";
-
 const fetchBackground = "fetchBackground";
+
 
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
@@ -75,126 +84,12 @@ void callbackDispatcher() {
   });
 }
 
-// void callbackDispatcher() {
-//   Workmanager().executeTask((task, inputData) async {
-//     switch (task) {
-//       case fetchParentalControl:
-//         try {
-//           // Initialize Notification Plugin
-//           await initLocalStorage();
-//           print("Fetching Parental Controls initialized local storage");
-//           String limitsJsonString = await localStorage.getItem('Limits') ?? '{}';
-//           print(limitsJsonString);
-//           final localLimits = jsonDecode(limitsJsonString);
-//           FlutterLocalNotificationsPlugin flip =
-//               FlutterLocalNotificationsPlugin();
-//           var android = AndroidInitializationSettings('@mipmap/ic_launcher');
-//           var settings = InitializationSettings(android: android);
-//           await flip.initialize(settings);
-//           // initialize firebase
-//           String email = inputData?['email'] ?? 'akshat@gmail.com';
-//           await Firebase.initializeApp(
-//               options: DefaultFirebaseOptions.currentPlatform);
-//           final parentalControls = FirebaseFirestore.instance
-//               .collection('parentalControls')
-//               .where('userID', isEqualTo: email)
-//               .where('active', isEqualTo: true)
-//               .get();
-
-//           Map<String, int> Limits = {};
-//           parentalControls.then((QuerySnapshot querySnapshot) {
-//             querySnapshot.docs.forEach((doc) {
-//               final Limits = doc['limits'];
-//             });
-//           }).catchError((error) {
-//             print("No parental controls found!");
-//           });
-
-//           // store Limits in local storage
-//           print(Limits);
-//           print("Local Limits: ");
-//           print(localLimits);
-//           localStorage.setItem('Limits', jsonEncode(Limits));
-//           if (localLimits != Limits) {
-//             var androidDetails = const AndroidNotificationDetails(
-//                 'channel_id', 'Focus Alert',
-//                 importance: Importance.max, priority: Priority.high, ticker: 'ticker');
-//             var platformDetails = NotificationDetails(android: androidDetails);
-//             await flip.show(
-//               0,
-//               'Focus Alert',
-//               'You have received new parental locks for the following apps:\n${Limits.entries.map((entry) => '${entry.key}: ${entry.value}').join("\n")}',
-//               platformDetails,
-//             );
-
-//           }
-//         } catch (e) {
-//           print(e);
-//         }        
-//         break;
-//         case checkAppUsage:
-//         try {
-//           // Initialize Notification Plugin
-
-//           FlutterLocalNotificationsPlugin flip =
-//               FlutterLocalNotificationsPlugin();
-//           var android = AndroidInitializationSettings('@mipmap/ic_launcher');
-//           var settings = InitializationSettings(android: android);
-//           await flip.initialize(settings);
-//           String email = inputData?['email'] ?? 'akshat@gmail.com';
-//           await Firebase.initializeApp(
-//               options: DefaultFirebaseOptions.currentPlatform);
-//           await initLocalStorage();
-//           String limitsJsonString = await localStorage.getItem('Limits') ?? '{}';
-//           final limits = jsonDecode(limitsJsonString);
-//           final DateTime timeNow = DateTime.now();
-//           final DateTime todayStart = DateTime(timeNow.year, timeNow.month, timeNow.day, 0, 0, 0);
-//           var usage = await AppUsage().getAppUsage(todayStart, timeNow);
-//           var usageMap = {};
-//           usage.forEach((appUsageInfo) {
-//             usageMap[appUsageInfo.packageName] = appUsageInfo.usage.inMinutes;
-//           });
-//           var exceededApps = {};
-//           limits.forEach((app, limit) {
-//             if (usageMap[app] > limit) {
-//               exceededApps[app] = usageMap[app];
-//             }
-//           });
-//           var halfExceededApps = {};
-//           limits.forEach((app, limit) {
-//             if (usageMap[app] > limit/2) {
-//               halfExceededApps[app] = usageMap[app];
-//             }
-//           });
-//           var androidDetails = const AndroidNotificationDetails(
-//                 'channel_id', 'Focus Alert',
-//                 importance: Importance.max, priority: Priority.high, ticker: 'ticker');
-//           if (exceededApps.isNotEmpty) {
-//             var platformDetails = NotificationDetails(android: androidDetails);
-//             await flip.show(0, 'Focus Alert', 'You have exceeded the usage limit for the following apps: ${exceededApps.keys.join(", ")}', platformDetails);
-//           }
-//           else if(halfExceededApps.isNotEmpty){
-//             var platformDetails = NotificationDetails(android: androidDetails);
-//             await flip.show(0, 'Focus Alert', 'You have used more than 50% of the usage limit for the following apps: ${halfExceededApps.keys.join(", ")}', platformDetails);
-//           }
-          
-//         } catch (e) {
-//           print(e);
-//         }
-//         break;
-//         default:
-            
-//     }
-//     return Future.value(true); 
-//   }
-//   );
-  
-// }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   String email = 'akshat@gmail.com';
+  OpenAI.apiKey = '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';
   Workmanager().initialize(
     callbackDispatcher, // The top-level function, aka callbackDispatcher
     isInDebugMode: true // If true, enables debugging to ensure it works correctly
@@ -225,210 +120,209 @@ Future<void> main() async {
         '/challenges': (context) => ChallengePage(currentUserId: email),
         '/acceptedChallenges': (context) => AcceptedChallenges(currentUserId: email),
         '/issueChallenge': (context) => IssueChallenge(currentUserId: email),
+        '/profilePage': (context) => ProfilePage(currentUserId: email),
       },
     ),
   );
 }
 
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  late FlutterLocalNotificationsPlugin _notificationsPlugin;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Home Screen'),
-      ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                'Welcome to the Home Screen',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/register'),
-                child: Text('Register'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/track'),
-                child: Text('Track'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/friends'),
-                child: Text('Friends'),
-              ),
-              ElevatedButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, '/friendrequests'),
-                child: Text('Friend Requests'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/map'),
-                child: Text('Map'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/sudoku'),
-                child: Text('Sudoku'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/game'),
-                child: Text('Chuck Jump'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/inviteFriend'),
-                child: Text('Invite Friends'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/challenges'),
-                child: Text('Challenges'),
-              ),
-              ElevatedButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, '/acceptedChallenges'),
-                child: Text('Accepted Challenges'),
-              ),
-              ElevatedButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, '/issueChallenge'),
-                child: Text('Issue Challenge'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }}
-// import 'package:flutter/material.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:focus/firebase_options.dart';
-// import 'package:focus/sudoku.dart';
-// import 'friends.dart';
-// import 'login.dart';
-// import 'track.dart';
-// import 'map.dart';
-// import 'package:flutter/services.dart';
-// import 'dart:async';
-// import 'dart:isolate';
-// import 'package:intl/intl.dart';
-// import 'storage.dart';
-// import 'dart:async';
-// import 'package:firebase_storage/firebase_storage.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:flutter/material.dart';
-// import 'login.dart';
-// import 'track.dart';
-// import 'firebase_options.dart';
-// import 'dart:convert';
-// import 'package:intl/intl.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'main_chuck.dart';
-// import 'package:flutter_isolate/flutter_isolate.dart';
-// import 'package:app_usage/app_usage.dart';
-// import 'package:workmanager/workmanager.dart';
-// import 'challenge.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:localstorage/localstorage.dart';
-
-// const fetchBackground = "fetchBackground";
-
-// void callbackDispatcher() {
-//   Workmanager().executeTask((task, inputData) async {
-//     switch (task) {
-//       case fetchBackground:
-//         try {
-//           // Initialize Notification Plugin
-//           FlutterLocalNotificationsPlugin flip = FlutterLocalNotificationsPlugin();
-//           var android = AndroidInitializationSettings('@mipmap/ic_launcher');
-//           var settings = InitializationSettings(android: android);
-//           await flip.initialize(settings);
-
-//           // Check App Usage
-//           AppUsage appUsage = AppUsage();
-//           try {
-//             DateTime endDate = DateTime.now();
-//             DateTime startDate = endDate.subtract(Duration(hours: 1)); // check last hour usage
-//             List<AppUsageInfo> infoList = await appUsage.getAppUsage(startDate, endDate);
-//             bool isYouTubeActive = infoList.any((info) => info.packageName.contains('com.google.android.youtube') && info.usage.inMinutes > 1);
-            
-//             if (isYouTubeActive) {
-//               // Send Notification if YouTube was active in the last hour
-//               var androidDetails = const AndroidNotificationDetails(
-//                 'channel_id', 'YouTube Notification',
-//                 importance: Importance.max, priority: Priority.high, ticker: 'ticker');
-//               var platformDetails = NotificationDetails(android: androidDetails);
-//               await flip.show(0, 'YouTube Checker', 'YouTube is active in the last hour!', platformDetails);
-//             }
-//           } catch (e) {
-//             print("Error fetching app usage: $e");
-//           }
-//         } catch (e) {
-//           print("Failed to send notification: $e");
-//         }
-//         break;
-//     }
-//     return Future.value(true); // Return true to indicate task completion
-//   });
-// }
-// Future<void> main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-//   String email = await Authentication.getEmail();
-//   //String email = 'akshat@gmail.com';
-//   // Workmanager().initialize(
-//   //   callbackDispatcher, // The top-level function, aka callbackDispatcher
-//   //   isInDebugMode: true // If true, enables debugging to ensure it works correctly
-//   // );
-//   // Workmanager().registerPeriodicTask(
-//   //   "1",
-//   //   fetchBackground,
-//   //   //initialDelay: Duration(seconds: 10),
-//   //   frequency: Duration(seconds: 15), // defines the frequency in which your task should be called
-//   //   constraints: Constraints(
-//   //     networkType: NetworkType.connected,
-//   //   ),
-//   // );
-//   runApp(
-//     MaterialApp(
-//       initialRoute: '/',
-//       routes: {
-//         '/': (context) => LoginScreen(),
-//         '/home': (context) => HomeScreen(),
-//         '/register': (context) => RegisterPage(),
-//         '/track': (context) => TrackPage(),
-//         '/friends': (context) => FriendsPage(currentUserId: email),
-//         '/friendrequests': (context) =>
-//             FriendRequestsPage(currentUserId: email),
-//         '/map': (context) => MapPage(),
-//         '/sudoku': (context) => SudokuPage(currentUserId: email),
-//         '/game': (context) => GameScreen(),
-//         '/inviteFriend': (context) => InviteFriendPage(currentUserId: email),
-//         '/challenges': (context) => ChallengePage(currentUserId: email),
-//         '/acceptedChallenges': (context) => AcceptedChallenges(currentUserId: email),
-//         '/issueChallenge': (context) => IssueChallenge(currentUserId: email),
-//       },
-//     ),
-//   );
-// }
-
 // class HomeScreen extends StatefulWidget {
 //   @override
 //   _HomeScreenState createState() => _HomeScreenState();
 // }
+
+// Widget _buildCard({required Color color, required IconData icon, required String label}) {
+//   return Container(
+//     decoration: BoxDecoration(
+//       borderRadius: BorderRadius.circular(20),
+//       gradient: LinearGradient(
+//         begin: Alignment.topLeft,
+//         end: Alignment.bottomRight,
+//         colors: [
+//           color.withOpacity(0.8), // Lighter color at the top left
+//           color, // Original color
+//           color.withOpacity(0.9), // Slightly lighter color towards the bottom right
+//           Colors.white.withOpacity(0.2), // A touch of gloss at the bottom right
+//         ],
+//         stops: [
+//           0.0,
+//           0.55,
+//           0.75,
+//           1.0,
+//         ],
+//       ),
+//       boxShadow: [
+//         BoxShadow(
+//           color: color.withOpacity(0.5),
+//           offset: Offset(0, 8),
+//           blurRadius: 12,
+//         ),
+//       ],
+//     ),
+//     child: Column(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       children: <Widget>[
+//         Icon(
+//           icon,
+//           size: 40,
+//           color: Colors.white,
+//         ),
+//         SizedBox(height: 8),
+//         Text(
+//           label,
+//           style: TextStyle(
+//             color: Colors.white,
+//             fontSize: 16,
+//           ),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
+// Widget _buildCard({required Color color, required IconData icon, required String label}) {
+//   return Container(
+//     decoration: BoxDecoration(
+//       color: color,
+//       borderRadius: BorderRadius.circular(20),
+//       boxShadow: [
+//         // Dark shadow on the bottom right
+//         BoxShadow(
+//           color: Colors.black.withOpacity(0.2),
+//           offset: Offset(4, 4),
+//           blurRadius: 8,
+//           spreadRadius: 2,
+//         ),
+//         // Light shadow on the top left for a lifted edge illusion
+//         BoxShadow(
+//           color: Colors.white.withOpacity(0.7),
+//           offset: Offset(-4, -4),
+//           blurRadius: 8,
+//           spreadRadius: 2,
+//         ),
+//       ],
+//     ),
+//     child: Column(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       children: <Widget>[
+//         Icon(
+//           icon,
+//           size: 40,
+//           color: Colors.white,
+//         ),
+//         SizedBox(height: 8),
+//         Text(
+//           label,
+//           style: TextStyle(
+//             color: Colors.white,
+//             fontSize: 16,
+//           ),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
+Widget _buildCard({
+  required Color color, 
+  required IconData icon, 
+  required String label, 
+  required String route,
+  required BuildContext context
+}) {
+  return GestureDetector(
+    onTap: () {
+      Navigator.pushNamed(context, route);
+      // // Pushing a new route
+      // Navigator.of(context).push(
+      //   MaterialPageRoute(
+      //     builder: (context) => , // Replace with your new page class
+      //   ),
+      // );
+    },
+    child: Container(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            offset: Offset(4, 4),
+            blurRadius: 8,
+            spreadRadius: 2,
+          ),
+          BoxShadow(
+            color: Colors.white.withOpacity(0.7),
+            offset: Offset(-4, -4),
+            blurRadius: 8,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(
+            icon,
+            size: 60,
+            color: Colors.white,
+          ),
+          SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class SearchBar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: PhysicalModel(
+        color: Colors.white,
+        elevation: 8,
+        shadowColor: Colors.black,
+        borderRadius: BorderRadius.circular(15),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: "Get Personalized Suggestions, Search Now",
+              contentPadding: EdgeInsets.symmetric(vertical: 16),
+              border: InputBorder.none,
+              suffixIcon: Icon(Icons.search),
+            ),
+            style: TextStyle(fontSize: 12),
+            textInputAction: TextInputAction.search,
+            onSubmitted: (value) {
+              if (value.isEmpty) {
+                Fluttertoast.showToast(
+        msg: "Please enter a search query before submitting!",
+        toastLength: Toast.LENGTH_SHORT,
+        // gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 12.0
+    );
+              } else {
+                // Perform search operation
+                print('Searching for: $value');
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 // class _HomeScreenState extends State<HomeScreen> {
 //   late FlutterLocalNotificationsPlugin _notificationsPlugin;
@@ -437,9 +331,141 @@ class _HomeScreenState extends State<HomeScreen> {
 //   void initState() {
 //     super.initState();
 //   }
+class HomeScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        title: Text('Hi, Dimsest'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: <Widget>[
+            Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: SearchBar(),
+        ),
+        //Gap(16),
+
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 1.0,
+                children: <Widget>[
+                  _buildCard(
+                    color: Color.fromARGB(255, 255, 105, 97),
+                    icon: Icons.track_changes,
+                    label: 'Track Usage',
+                    route: '/track',
+                    context: context
+                  ),
+                  _buildCard(
+                    color: Color.fromARGB(255, 255, 105, 97),
+                    icon: Icons.facebook,
+                    label: 'Friends',
+                    route: '/friends',
+                    context: context
+                  ),
+                  _buildCard(
+                    color: Color.fromARGB(255, 255, 105, 97),
+                    icon: Icons.gamepad,
+                    label: 'Game',
+                    route: '/game',
+                    context: context
+                  ),
+                  _buildCard(
+                    color: Color.fromARGB(255, 255, 105, 97),
+                    icon: Icons.alarm,
+                    label: 'Challenges',
+                    route: '/challenges',
+                    context: context
+                  ),
+                ],
+              ),
+            ),
+
+
+
+SingleChildScrollView(
+  scrollDirection: Axis.horizontal,
+  child: Row(children: [ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/register'),
+                  child: Text('Register'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/track'),
+                  child: Text('Track'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/friends'),
+                  child: Text('Friends'),
+                ),
+                ElevatedButton(
+                  onPressed: () =>
+                      Navigator.pushNamed(context, '/friendrequests'),
+                  child: Text('Friend Requests'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/map'),
+                  child: Text('Map'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/sudoku'),
+                  child: Text('Sudoku'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/game'),
+                  child: Text('Chuck Jump'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/inviteFriend'),
+                  child: Text('Invite Friends'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/challenges'),
+                  child: Text('Challenges'),
+                ),
+                ElevatedButton(
+                  onPressed: () =>
+                      Navigator.pushNamed(context, '/acceptedChallenges'),
+                  child: Text('Accepted Challenges'),
+                ),
+                ElevatedButton(
+                  onPressed: () =>
+                      Navigator.pushNamed(context, '/issueChallenge'),
+                  child: Text('Issue Challenge'),
+                ),
+                ElevatedButton(
+                  onPressed: () =>
+                      Navigator.pushNamed(context, '/profilePage'),
+                  child: Text('Profile Page'),
+                ),],),
+),
+            
+          ],
+        ),
+      ),
+    );
+  }
+
+  
+}
+
 
 //   @override
 //   Widget build(BuildContext context) {
+
 //     return Scaffold(
 //       appBar: AppBar(
 //         title: Text('Home Screen'),
@@ -449,6 +475,45 @@ class _HomeScreenState extends State<HomeScreen> {
 //           child: Column(
 //             mainAxisAlignment: MainAxisAlignment.center,
 //             children: <Widget>[
+// GridView.count(
+//         crossAxisCount: 2,
+//         childAspectRatio: 3 / 2, // Adjusts the aspect ratio of the buttons
+//         mainAxisSpacing: 10, // Spacing between rows
+//         crossAxisSpacing: 10, // Spacing between columns
+//         padding: EdgeInsets.all(10), // Padding around the grid
+//         children: <Widget>[
+//           MainMenuRoundedButton(
+//             text: "Home",
+//             icon: Icons.home,
+//             color: Colors.blue,
+//             onPressed: () => print("Home Pressed"),
+//           ),
+//           MainMenuRoundedButton(
+//             text: "Settings",
+//             icon: Icons.settings,
+//             color: Colors.red,
+//             onPressed: () => print("Settings Pressed"),
+//           ),
+//           MainMenuRoundedButton(
+//             text: "Profile",
+//             icon: Icons.person,
+//             color: Colors.green,
+//             onPressed: () => print("Profile Pressed"),
+//           ),
+//           MainMenuRoundedButton(
+//             text: "Messages",
+//             icon: Icons.message,
+//             color: Colors.orange,
+//             onPressed: () => print("Messages Pressed"),
+//           ),
+//         ],
+//       ),
+
+
+
+
+
+
 //               Text(
 //                 'Welcome to the Home Screen',
 //                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -500,125 +565,15 @@ class _HomeScreenState extends State<HomeScreen> {
 //                     Navigator.pushNamed(context, '/issueChallenge'),
 //                 child: Text('Issue Challenge'),
 //               ),
+//               ElevatedButton(
+//                 onPressed: () =>
+//                     Navigator.pushNamed(context, '/profilePage'),
+//                 child: Text('Profile Page'),
+//               ),
 //             ],
+            
 //           ),
 //         ),
 //       ),
 //     );
 //   }}
-
-//   // void callbackDispatcher() {
-// //   Workmanager().executeTask((task, inputData) async {
-// //     switch (task) {
-// //       case fetchParentalControl:
-// //         try {
-// //           // Initialize Notification Plugin
-// //           await initLocalStorage();
-// //           print("Fetching Parental Controls initialized local storage");
-// //           String limitsJsonString = await localStorage.getItem('Limits') ?? '{}';
-// //           print(limitsJsonString);
-// //           final localLimits = jsonDecode(limitsJsonString);
-// //           FlutterLocalNotificationsPlugin flip =
-// //               FlutterLocalNotificationsPlugin();
-// //           var android = AndroidInitializationSettings('@mipmap/ic_launcher');
-// //           var settings = InitializationSettings(android: android);
-// //           await flip.initialize(settings);
-// //           // initialize firebase
-// //           String email = inputData?['email'] ?? 'akshat@gmail.com';
-// //           await Firebase.initializeApp(
-// //               options: DefaultFirebaseOptions.currentPlatform);
-// //           final parentalControls = FirebaseFirestore.instance
-// //               .collection('parentalControls')
-// //               .where('userID', isEqualTo: email)
-// //               .where('active', isEqualTo: true)
-// //               .get();
-
-// //           Map<String, int> Limits = {};
-// //           parentalControls.then((QuerySnapshot querySnapshot) {
-// //             querySnapshot.docs.forEach((doc) {
-// //               final Limits = doc['limits'];
-// //             });
-// //           }).catchError((error) {
-// //             print("No parental controls found!");
-// //           });
-
-// //           // store Limits in local storage
-// //           print(Limits);
-// //           print("Local Limits: ");
-// //           print(localLimits);
-// //           localStorage.setItem('Limits', jsonEncode(Limits));
-// //           if (localLimits != Limits) {
-// //             var androidDetails = const AndroidNotificationDetails(
-// //                 'channel_id', 'Focus Alert',
-// //                 importance: Importance.max, priority: Priority.high, ticker: 'ticker');
-// //             var platformDetails = NotificationDetails(android: androidDetails);
-// //             await flip.show(
-// //               0,
-// //               'Focus Alert',
-// //               'You have received new parental locks for the following apps:\n${Limits.entries.map((entry) => '${entry.key}: ${entry.value}').join("\n")}',
-// //               platformDetails,
-// //             );
-
-// //           }
-// //         } catch (e) {
-// //           print(e);
-// //         }        
-// //         break;
-// //         case checkAppUsage:
-// //         try {
-// //           // Initialize Notification Plugin
-
-// //           FlutterLocalNotificationsPlugin flip =
-// //               FlutterLocalNotificationsPlugin();
-// //           var android = AndroidInitializationSettings('@mipmap/ic_launcher');
-// //           var settings = InitializationSettings(android: android);
-// //           await flip.initialize(settings);
-// //           String email = inputData?['email'] ?? 'akshat@gmail.com';
-// //           await Firebase.initializeApp(
-// //               options: DefaultFirebaseOptions.currentPlatform);
-// //           await initLocalStorage();
-// //           String limitsJsonString = await localStorage.getItem('Limits') ?? '{}';
-// //           final limits = jsonDecode(limitsJsonString);
-// //           final DateTime timeNow = DateTime.now();
-// //           final DateTime todayStart = DateTime(timeNow.year, timeNow.month, timeNow.day, 0, 0, 0);
-// //           var usage = await AppUsage().getAppUsage(todayStart, timeNow);
-// //           var usageMap = {};
-// //           usage.forEach((appUsageInfo) {
-// //             usageMap[appUsageInfo.packageName] = appUsageInfo.usage.inMinutes;
-// //           });
-// //           var exceededApps = {};
-// //           limits.forEach((app, limit) {
-// //             if (usageMap[app] > limit) {
-// //               exceededApps[app] = usageMap[app];
-// //             }
-// //           });
-// //           var halfExceededApps = {};
-// //           limits.forEach((app, limit) {
-// //             if (usageMap[app] > limit/2) {
-// //               halfExceededApps[app] = usageMap[app];
-// //             }
-// //           });
-// //           var androidDetails = const AndroidNotificationDetails(
-// //                 'channel_id', 'Focus Alert',
-// //                 importance: Importance.max, priority: Priority.high, ticker: 'ticker');
-// //           if (exceededApps.isNotEmpty) {
-// //             var platformDetails = NotificationDetails(android: androidDetails);
-// //             await flip.show(0, 'Focus Alert', 'You have exceeded the usage limit for the following apps: ${exceededApps.keys.join(", ")}', platformDetails);
-// //           }
-// //           else if(halfExceededApps.isNotEmpty){
-// //             var platformDetails = NotificationDetails(android: androidDetails);
-// //             await flip.show(0, 'Focus Alert', 'You have used more than 50% of the usage limit for the following apps: ${halfExceededApps.keys.join(", ")}', platformDetails);
-// //           }
-          
-// //         } catch (e) {
-// //           print(e);
-// //         }
-// //         break;
-// //         default:
-            
-// //     }
-// //     return Future.value(true); 
-// //   }
-// //   );
-  
-// // }

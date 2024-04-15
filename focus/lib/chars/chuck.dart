@@ -2,9 +2,9 @@ import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/effects.dart';
-import '../env/ground_block.dart';
-import '../env/platform_block.dart';
-import '../env/star.dart';
+import '../chuck_environment/ground_block.dart';
+import '../chuck_environment/platform_block.dart';
+import '../chuck_environment/star.dart';
 import '../chars/logo_enemy.dart';
 import '../chuck_jump.dart';
 

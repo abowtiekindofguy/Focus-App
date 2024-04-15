@@ -50,6 +50,12 @@ dependencies:
   workmanager: ^0.5.2
   localstorage: ^5.0.0
   fl_chart: ^0.67.0
+  dart_openai: ^5.1.0
+  envied: ^0.5.4+1
+  permission_handler: ^11.3.1
+  pdf: ^3.10.8
+  open_file: ^3.3.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -60,6 +66,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
+  envied_generator: ^0.5.4+1
+  build_runner: ^2.4.9
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

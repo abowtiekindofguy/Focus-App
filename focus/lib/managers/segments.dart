@@ -1,7 +1,7 @@
 import '../chars/logo_enemy.dart';
-import '../env/ground_block.dart';
-import '../env/platform_block.dart';
-import '../env/star.dart';
+import '../chuck_environment/ground_block.dart';
+import '../chuck_environment/platform_block.dart';
+import '../chuck_environment/star.dart';
 
 import 'package:flame/components.dart';
 
