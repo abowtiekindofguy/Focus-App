@@ -7,6 +7,7 @@ import 'storage.dart';
 import 'login.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 
 
@@ -30,14 +31,39 @@ class TrackPage extends StatefulWidget {
 
 class _TrackPageState extends State<TrackPage> {
   List<AppUsageInfo> info = [];
+  late List<BarChartGroupData> barGroups;
+
+
+
+  List<BarChartGroupData> getBarGroups(Map<int, int> rawMap) {
+  return rawMap.entries.map((entry) {
+    return BarChartGroupData(
+      x: entry.key,
+      barRods: [
+        BarChartRodData(
+          toY: entry.value.toDouble(),
+          color: Colors.blue,
+          width: 15 // Set the width of the bars
+        )
+      ],
+      showingTooltipIndicators: [0]
+    );
+  }).toList();
+}
+
+
   @override
   void initState(){
     super.initState();
     initAsync();
+
+
   }
 
   Future<void> initAsync() async {
     await getUsageStats();
+    Map<int,int> hourlyUsageComputed = await hourlyUsage();
+    barGroups = getBarGroups(hourlyUsageComputed);
     uploadUsageStats();
   }
 
@@ -64,27 +90,27 @@ class _TrackPageState extends State<TrackPage> {
     }
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: Text('Track Page'),
-  //     ),
-  //     body: 
-  //     ListView.builder(
-  //       itemCount: info.length,
-  //       itemBuilder: (context, index) {
-  //         return ListTile(
-  //           title: Text(info[index].appName),
-  //           subtitle: Text(info[index].packageName),
-  //           trailing: Text(info[index].usage.inMinutes.toString() + ' minutes'),
-  //         );
-  //       },
-  //     ),
+List<String> packagesBlock = ['com.whatsapp','com.google.android.youtube', 'com.instagram.android'];
 
-      
-  //   );
-  // }
+  Future<Map<int,int>> hourlyUsage() async {
+    DateTime now = DateTime.now();
+    DateTime start = DateTime(now.year, now.month, now.day, 0, 0, 0);
+    int hour = now.hour;
+    Map<int, int> hourlyUsage = {};
+    for (int i = 0; i < hour; i++) {
+      DateTime end = start.add(Duration(hours: i + 1));
+      List<AppUsageInfo> infoList = await AppUsage().getAppUsage(start, end);
+      int totalUsage = 0;
+      for (AppUsageInfo info in infoList) {
+        if (packagesBlock.contains(info.packageName)) {
+          totalUsage += info.usage.inMinutes;
+        }
+      }
+      hourlyUsage[i] = totalUsage;
+    }
+    return hourlyUsage; 
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,6 +142,51 @@ class _TrackPageState extends State<TrackPage> {
                 style: TextStyle(color: Colors.white, fontSize: 36),
               ),
             ),
+
+
+
+//             BarChart(
+//           BarChartData(
+//   titlesData: FlTitlesData(
+//     show: true,
+//     bottomTitles: SideTitles(
+//       showTitles: true,
+//       reservedSize: 30, // specifies the space reserved for titles
+//       getTextStyles: (context, value) => const TextStyle(
+//         color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+//       margin: 10, // space between the titles and the bars
+//       getTitles: (double value) {
+//         // Assuming the map keys are integers and used directly as x-axis
+//         return 'Q$value'; // Prefix 'Q' or any other formatter based on your requirements
+//       },
+//     ),
+//     leftTitles: SideTitles(
+//       showTitles: true,
+//       reservedSize: 40, // space reserved for the left titles
+//       getTextStyles: (context, value) => const TextStyle(
+//         color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+//       getTitles: (value) {
+//         if (value == 0) {
+//           return '0';
+//         }
+//         if (value % 10 == 0) {
+//           return '${value.toInt()}'; // Only show labels for values that are multiples of 10
+//         }
+//         return '';
+//       },
+//     ),
+//   ),
+//   borderData: FlBorderData(
+//     show: true,
+//     border: Border.all(color: const Color(0xff37434d), width: 1)),
+//   barGroups: barGroups,
+//   alignment: BarChartAlignment.spaceAround,
+//   maxY: 30,  // assuming 30 is the maximum y value
+// )
+//         ),
+
+
+
             // Create a list view for the apps list
             ListView.builder(
               shrinkWrap: true,
