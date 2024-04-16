@@ -26,8 +26,10 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
   late final HudButtonComponent boosterButton;
   Set<int> keys = {};
   int starsCollected = 0;
-  int health = 5;
-
+  int health;
+  int theme = 0;
+  bool startGame = false;
+  ChuckJumpGame({required this.health});
   @override
   Future<void> onLoad() async {
     await images.loadAll([
@@ -44,7 +46,7 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
       'button_booster.png',
     ]);
     camera.viewfinder.anchor = Anchor.topLeft;
-    camera.viewport.add(Hud());
+    camera.viewport.add(Hud(heartImage: 'heart.png', heartHalfImage: 'heart_half.png'));
     initializeGame(true);
         // Create left button
     leftButton = createButtonComponent(
@@ -96,10 +98,21 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
     keys.add(key);
     _chuck.onKeyEvent(keys);
   }
-
+  
   @override
   Color backgroundColor() {
+    if(theme == 0){
+      return const Color.fromARGB(255, 173, 223, 247);
+    } else if(theme == 1){
+      return Color.fromARGB(255, 80, 3, 101);
+    } else if(theme == 2){
+      return Color.fromARGB(255, 0, 0, 0);
+    } else if(theme == 3){
+      return Color.fromARGB(255, 65, 4, 4);
+    }
+      
     return const Color.fromARGB(255, 173, 223, 247);
+
   }
 
   void loadGameSegments(int segmentIndex, double xPositionOffset) {
@@ -110,6 +123,7 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
             GroundBlock(
               gridPosition: block.gridPosition,
               xOffset: xPositionOffset,
+              blockImage: (theme == 0) ? 'ground.png' : 'block.png',
             ),
           );
           break;
@@ -126,8 +140,10 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
               xOffset: xPositionOffset,
             ),
           );
+        
           break;
         case LogoEnemy:
+        if(startGame){
           world.add(
             LogoEnemy(
             gridPosition: block.gridPosition,
@@ -135,6 +151,7 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
             ),
           );
           break;
+        }
       }
     }
   }
@@ -147,21 +164,36 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
   for (var i = 0; i <= segmentsToLoad; i++) {
     loadGameSegments(i, (640 * i).toDouble());
   }
-
+  if(startGame){
   _chuck = ChuckPlayer(
     position: Vector2(128, canvasSize.y - 128),
   );
+  
   add(_chuck);
   if (loadHud) {
-    add(Hud());
+    add(Hud(heartImage: 'heart.png',heartHalfImage: 'heart_half.png'));
+  } 
   }
 }
 
-void reset() {
+void reset(bool start) {
   starsCollected = 0;
-  health = 3;
-  initializeGame(false);
+  if(!start) {
+    health = 3;
+    add(Hud(heartImage: 'heart.png',heartHalfImage: 'heart_half.png'));
+  }
+  // initializeGame(false);
 }
+
+  void set_theme(int theme){
+    this.theme = theme;
+    backgroundColor();
+    // reset();
+  } 
+
+  void start_game(){
+    startGame = true;
+  }
 
   HudButtonComponent createButtonComponent({
     required Vector2 position,

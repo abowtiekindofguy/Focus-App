@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:focus/chuck_environment/ground_block.dart';
 
 import '../chuck_jump.dart';
 
 class MainMenu extends StatelessWidget {
   // Reference to parent game.
   final ChuckJumpGame game;
-
-  const MainMenu({super.key, required this.game});
+  
+  MainMenu({super.key, required this.game});
 
   @override
   Widget build(BuildContext context) {
@@ -15,59 +16,104 @@ class MainMenu extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.all(10.0),
-          height: 250,
-          width: 300,
-          decoration: const BoxDecoration(
-            color: blackTextColor,
-            borderRadius: const BorderRadius.all(
-              Radius.circular(20),
+      child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildMenuItem(
+          'Ground Surf',
+          blackTextColor,
+          whiteTextColor,
+          () {
+            game.set_theme(0);
+          },
+          ),
+          _buildMenuItem(
+          'Tech Mania',
+          blackTextColor,
+          whiteTextColor,
+          () {
+            game.set_theme(1);
+          },
+          ),
+          _buildMenuItem(
+          'Cosmo Leap',
+          blackTextColor,
+          whiteTextColor,
+          () {
+            game.set_theme(2);
+          },
+          ),
+          _buildMenuItem(
+          'Lava Lunge',
+          blackTextColor,
+          whiteTextColor,
+          () {
+            game.set_theme(3);
+          },
+          ),
+        ],
+        ),
+        SizedBox(height: 20),
+        ElevatedButton(
+        onPressed: () {
+          game.overlays.remove('MainMenu');
+          game.start_game();
+         // game.reset(true);
+         game.initializeGame(false);
+        },
+        child: Text(
+          'Start Game',
+          style: TextStyle(
+          color: blackTextColor,
+          fontSize: 24,
+          ),
+        ),
+        ),
+      ],
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(
+    String title,
+    Color backgroundColor,
+    Color textColor,
+    VoidCallback onPressed,
+  ) {
+    return Container(
+      width: 200,
+      height: 300,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 24,
+                fontStyle: FontStyle.values[0],
+              ),
             ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Ember Quest',
-                style: TextStyle(
-                  color: whiteTextColor,
-                  fontSize: 24,
-                ),
-              ),
-              const SizedBox(height: 40),
-              SizedBox(
-                width: 200,
-                height: 75,
-                child: ElevatedButton(
-                  onPressed: () {
-                    game.overlays.remove('MainMenu');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: whiteTextColor,
-                  ),
-                  child: const Text(
-                    'Play',
-                    style: TextStyle(
-                      fontSize: 40.0,
-                      color: blackTextColor,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-'''Use the left and right arrow buttons for movement, and the up arrow button to jump.
-Collect as many stars as you can and avoid logo enemies!''',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: whiteTextColor,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
+            // const SizedBox(height: 10),
+            // Icon(
+            //   Icons.add,
+            //   color: textColor,
+            //   size: 40,
+            // ),
+          ],
         ),
       ),
     );

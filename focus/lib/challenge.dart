@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:focus/appIcon.dart';
 import 'package:focus/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login.dart';
@@ -18,40 +19,78 @@ import 'firebase_options.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'track.dart';
 import 'validator.dart';
 import 'package:localstorage/localstorage.dart';
+import 'widgets/row_button.dart';
 
 
-List<String> packagesBlock = ['com.whatsapp','com.google.android.youtube', 'com.instagram.android'];
+List<String> packagesBlock = ['com.whatsapp','com.google.android.youtube', 'com.instagram.android', 'com.twitter.android', 'com.facebook.katana', 'com.snapchat.android', 'com.tinder', 'com.linkedin.android', 'com.pinterest', 'com.reddit.frontpage', 'com.spotify.music' ];
 
-Future<void> addChallenge(String challengeId, Map<String, dynamic> challenge) async {
+Future<Map<String,int>> getAllChallengeMinimum() async{
+  Map<String,int> challengeMinimum = {};
   await initLocalStorage();
-  String challenges = localStorage.getItem('challenges') ?? '{}';
   String challengesList = localStorage.getItem('challengesCollection') ?? '{}';
   Map<String,Map<String, dynamic>> challengesCollection = Map<String,Map<String, dynamic>>.from(jsonDecode(challengesList));
-  Map<String, int> goalChallenge = Map<String, int>.from(jsonDecode(challenges));
-  challengesCollection[challengeId] = challenge;
-  for (String packageName in challenge.keys) {
-    if (packagesBlock.contains(packageName)) {
-      goalChallenge[packageName] = min(challenge[packageName] ?? 240000, goalChallenge[packageName] ?? 24000);
+  for (String challengeId in challengesCollection.keys){
+    Map<String, dynamic> challenge = challengesCollection[challengeId]!;
+    for (String packageName in packagesBlock){
+      if (challenge.containsKey(packageName)){
+        challengeMinimum[packageName] = min(challengeMinimum[packageName] ?? 24000, challenge[packageName]);
+      }
     }
   }
-  localStorage.setItem('challenges', jsonEncode(goalChallenge));
+  return challengeMinimum;
+}
+
+Future<Map<String,Map<String,int>>> getAllChallenges() async{
+  await initLocalStorage();
+  String challengesList = localStorage.getItem('challengesCollection') ?? '{}';
+  Map<String,Map<String, int>> challengesCollection = Map<String,Map<String, int>>.from(jsonDecode(challengesList));
+  return challengesCollection;
+}
+
+Future<int> numActiveChallenges() async{
+  await initLocalStorage();
+  String challengesList = localStorage.getItem('challengesCollection') ?? '{}';
+  Map<String,Map<String, int>> challengesCollection = Map<String,Map<String, int>>.from(jsonDecode(challengesList));
+  return challengesCollection.length;
+}
+
+Future<Map<String,int>> getChallengeStats(String challengeId) async{
+  await initLocalStorage();
+  String challengesList = localStorage.getItem('challengesCollection') ?? '{}';
+  Map<String,Map<String, int>> challengesCollection = Map<String,Map<String, int>>.from(jsonDecode(challengesList));
+  return challengesCollection[challengeId] ?? {};
+}
+
+Future<void> addChallengeToLocal(String challengeId, Map<String, dynamic> challenge) async {
+  await initLocalStorage();
+  String challengesList = localStorage.getItem('challengesCollection') ?? '{}';
+  Map<String,Map<String, dynamic>> challengesCollection = Map<String,Map<String, dynamic>>.from(jsonDecode(challengesList));
+  challengesCollection[challengeId] = challenge;
   localStorage.setItem('challengesCollection', jsonEncode(challengesCollection));
 }
 
-Future<Map<String,dynamic>> challengeGoals() async{
-  await initLocalStorage();
-  String challenges = localStorage.getItem('challenges') ?? '{}';
-  Map<String, int> challengesList = Map<String, int>.from(jsonDecode(challenges));
-  return challengesList;
-}
-
-Future<Map<String, dynamic>> challengeGoalsCollection() async {
-  await initLocalStorage();
-  String challengesList = localStorage.getItem('challengesCollection') ?? '{}';
-  Map<String,Map<String, dynamic>> challengesCollection = Map<String,Map<String, dynamic>>.from(jsonDecode(challengesList));
-  return challengesCollection;
+Future<double> getScore() async {
+  Map<String,int> appUsageinMinutes = await getDayAppUsageInMinutes();
+  Map<String,int> challengeMinimum = await getAllChallengeMinimum();
+  double score = 0;
+  for (String packageName in packagesBlock){
+    int appUsage = appUsageinMinutes[packageName] ?? 0;
+    if (challengeMinimum.containsKey(packageName)){
+      if (appUsage < challengeMinimum[packageName]!){
+        score += 1;
+      }
+      else{
+        score += 1 + (challengeMinimum[packageName]! - appUsage) / challengeMinimum[packageName]!;
+      }
+    }
+    else{
+       score += (appUsageinMinutes[packageName] ?? 0) / 60;
+    }
+  }
+  return score;
 }
 
 Future<void> issueChallenge(String challengeName, Map<String, dynamic> challenge, String currentUserId) async {
@@ -74,12 +113,37 @@ class IssueChallenge extends StatelessWidget {
   final String currentUserId;
   IssueChallenge({required this.currentUserId});
   //only take duration in minutes give only the apps written in the packagesBlock
-  final TextEditingController _whatsappController = TextEditingController();
-  final TextEditingController _youtubeController = TextEditingController();
-  final TextEditingController _instagramController = TextEditingController();
   final TextEditingController _challengeNameController = TextEditingController();
   final TextEditingController _challengeDescriptionController = TextEditingController();
   final TextEditingController _challengeDurationController = TextEditingController();
+
+  final Map<String, TextEditingController> _appControllers = {
+    'com.whatsapp': TextEditingController(),
+    'com.google.android.youtube': TextEditingController(),
+    'com.instagram.android': TextEditingController(),
+  };
+
+  String? _validateDuration(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a duration';
+    }
+    int? duration = int.tryParse(value);
+    if (duration == null || duration <= 0) {
+      return 'Please enter a valid duration';
+    }
+    return null;
+  }
+
+  String? _validateAppDuration(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a duration';
+    }
+    int? duration = int.tryParse(value);
+    if (duration == null || duration < 0) {
+      return 'Please enter a valid duration';
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,51 +154,56 @@ class IssueChallenge extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            TextField(
+            TextFormField(
               controller: _challengeNameController,
               decoration: InputDecoration(
                 labelText: 'Challenge Name',
               ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a challenge name';
+                }
+                return null;
+              },
             ),
-            TextField(
+            TextFormField(
               controller: _challengeDescriptionController,
               decoration: InputDecoration(
                 labelText: 'Challenge Description',
               ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a challenge description';
+                }
+                return null;
+              },
             ),
-            TextField(
+            TextFormField(
               controller: _challengeDurationController,
               decoration: InputDecoration(
                 labelText: 'Challenge Duration (in minutes)',
               ),
+              validator: _validateDuration,
             ),
-            TextField(
-              controller: _whatsappController,
-              decoration: InputDecoration(
-                labelText: 'Whatsapp Duration (in minutes)',
+            for (var app in _appControllers.keys)
+              TextFormField(
+                controller: _appControllers[app],
+                decoration: InputDecoration(
+                  labelText: '${app.split('.').last} Duration (in minutes)',
+                ),
+                validator: _validateAppDuration,
               ),
-            ),
-            TextField(
-              controller: _youtubeController,
-              decoration: InputDecoration(
-                labelText: 'Youtube Duration (in minutes)',
-              ),
-            ),
-            TextField(
-              controller: _instagramController,
-              decoration: InputDecoration(
-                labelText: 'Instagram Duration (in minutes)',
-              ),
-            ),
             ElevatedButton(
               onPressed: () async {
-                Map<String, dynamic> challenge = {
-                  'com.whatsapp': int.tryParse(_whatsappController.text) ?? 0,
-                  'com.google.android.youtube': int.tryParse(_youtubeController.text) ?? 0,
-                  'com.instagram.android': int.tryParse(_instagramController.text) ?? 0,
-                };
-                await issueChallenge(_challengeNameController.text, challenge, currentUserId);
-                Navigator.of(context).pop();
+                if (Form.of(context)!.validate()) {
+                  Map<String, dynamic> challenge = {
+                    'com.whatsapp': int.tryParse(_appControllers['com.whatsapp']!.text) ?? 0,
+                    'com.google.android.youtube': int.tryParse(_appControllers['com.google.android.youtube']!.text) ?? 0,
+                    'com.instagram.android': int.tryParse(_appControllers['com.instagram.android']!.text) ?? 0,
+                  };
+                  await issueChallenge(_challengeNameController.text, challenge, currentUserId);
+                  Navigator.of(context).pop();
+                }
               },
               child: Text('Issue Challenge'),
             ),
@@ -146,51 +215,86 @@ class IssueChallenge extends StatelessWidget {
 }
 
 
+
   class AcceptedChallenges extends StatelessWidget {
-    final String currentUserId;
+  final String currentUserId;
 
-    const AcceptedChallenges({ required this.currentUserId});
+  const AcceptedChallenges({required this.currentUserId});
 
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        // appBar: AppBar(
-        //   title: const Text('Accepted Challenges'),
-        // ),
-        body: SingleChildScrollView(
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Accepted Challenges'),
+      ),
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            const Text('Challenge Goals'),
-            FutureBuilder<Map<String, dynamic>>(
-              future: challengeGoals(),
+            FutureBuilder<int>(
+              future: numActiveChallenges(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return const CircularProgressIndicator(); // Show loading indicator while data is fetching
+                }
+                final numActive = snapshot.data ?? 0; // Default to 0 if data is null
+                return FutureBuilder<double>(
+                  future: getScore(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState != ConnectionState.done) {
+                      return const CircularProgressIndicator(); // Show loading indicator while data is fetching
+                    }
+                    final score = snapshot.data ?? 0; // Default to 0 if data is null
+                    return InfoRow(info: {'Active Challenges': numActive.toString(), 'Score': score.toStringAsFixed(3)});
+                  },
+                );
+              },
+            ),
+            const Tooltip(
+              message: "Calculated based on the Challenges accepted",
+              child: Expanded(
+                child: Text(
+                  'Limit Goals',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.left,
+                ),
+              ),
+            ),
+            FutureBuilder<Map<String, dynamic>>(
+              future: getAllChallengeMinimum(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator(); // Show loading indicator while data is fetching
+                }
                 Map<String, dynamic> challenges = snapshot.data!;
                 return ListView.builder(
                   shrinkWrap: true,
                   itemCount: challenges.keys.length,
                   itemBuilder: (context, index) {
                     String key = challenges.keys.elementAt(index);
-                    return ListTile(
-                      title: Text(key),
-                      trailing: Text('${challenges[key]} minutes'),
-                    );
+                    return AppTile(packageName: key, text: '${challenges[key]} minutes');
                   },
                 );
               },
             ),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/challenges'),
+              child: const Text('View All Challenges'),
+            ),
           ],
         ),
-        )
-      );
-    }
+      ),
+    );
   }
+}
+
 
 
 
 class ChallengePage extends StatelessWidget {
   final String currentUserId;
+  
   ChallengePage({required this.currentUserId});
+
   void _showBottomSheet(BuildContext context, Map<String, dynamic> dataMap, String challengeId, String currentUserId) {
     showModalBottomSheet(
       context: context,
@@ -201,10 +305,8 @@ class ChallengePage extends StatelessWidget {
           itemCount: dataMap.keys.length,
           itemBuilder: (_, index) {
             String key = dataMap.keys.elementAt(index);
-            return ListTile(
-              title: Text(key),
-              trailing: Text('${dataMap[key]}'+" minutes"),
-            );
+            return AppTile(packageName: key, text: '${dataMap[key]}'+" minutes");
+            
           },
         ),
       ),
@@ -265,7 +367,7 @@ class ChallengePage extends StatelessWidget {
 
   Future<void> acceptChallenge(String challengeId, String challengee, Map<String, dynamic> challenge) async {
     //create a new document in the challengesPortal collection
-    addChallenge(challengeId,challenge);
+    addChallengeToLocal(challengeId,challenge);
       await FirebaseFirestore.instance.collection('challengesPortal').doc(challengeId).set({
         'status': 'accepted',
         'taker' : challengee,

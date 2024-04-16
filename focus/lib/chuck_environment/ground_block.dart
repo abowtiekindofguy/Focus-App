@@ -11,15 +11,16 @@ class GroundBlock extends SpriteComponent with HasGameReference<ChuckJumpGame> {
   double xOffset;
   final UniqueKey _blockKey = UniqueKey();
   final Vector2 velocity = Vector2.zero();
-
+  final String blockImage;
   GroundBlock({
     required this.gridPosition,
     required this.xOffset,
+    required this.blockImage,
   }) : super(size: Vector2.all(32), anchor: Anchor.bottomLeft);
 
   @override
   void onLoad() {
-    final groundImage = game.images.fromCache('ground.png');
+    final groundImage = game.images.fromCache(blockImage);
     sprite = Sprite(groundImage);
     position = Vector2(
       gridPosition.x * size.x + xOffset,

@@ -1,35 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:focus/firebase_options.dart';
-import 'package:focus/sudoku.dart';
-import 'friends.dart';
-import 'login.dart';
-import 'track.dart';
-import 'map.dart';
-import 'package:flutter/services.dart';
+
 import 'dart:async';
-import 'dart:isolate';
-import 'package:intl/intl.dart';
-import 'storage.dart';
-import 'dart:async';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'login.dart';
-import 'track.dart';
-import 'firebase_options.dart';
-import 'dart:convert';
-import 'package:intl/intl.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'main_chuck.dart';
-import 'package:flutter_isolate/flutter_isolate.dart';
-import 'package:app_usage/app_usage.dart';
-import 'package:workmanager/workmanager.dart';
-import 'challenge.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:localstorage/localstorage.dart';
 import 'package:dart_openai/dart_openai.dart';
 
 Future<String> getResponse(String prompt) async {

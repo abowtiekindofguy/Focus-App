@@ -55,7 +55,14 @@ dependencies:
   permission_handler: ^11.3.1
   pdf: ^3.10.8
   open_file: ^3.3.2
-
+  qr_code_scanner: ^1.0.1
+  installed_apps: ^1.5.0
+  whatsapp_share: ^2.0.2
+  flutter_chat_ui: ^1.6.12
+  # open_filex: ^4.4.0
+  flutter_chat_types: ^3.6.2
+  image_picker: ^1.0.8
+  file_picker: ^8.0.0+1
 dev_dependencies:
   flutter_test:
     sdk: flutter

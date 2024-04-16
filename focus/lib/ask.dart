@@ -53,34 +53,34 @@ class TextRoundedBox extends StatelessWidget {
   // }
 }
 
-class AskPage extends StatefulWidget{
-  //stateful widget
+// class AskPage extends StatefulWidget{
+//   //stateful widget
   
-  @override
-  _AskPageState createState() => _AskPageState();
+//   @override
+//   _AskPageState createState() => _AskPageState();
 
-}
+// }
 
-class _AskPageState extends State<AskPage> {
-  //stateful widget
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Ask a Question'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Enter your question',
-              ),
-              keyboardType: TextInputType.text,
-            ),
-            SizedBox(height: 20),
-            TextRoundedBox(
-              text: 'Submit',
-              color: Colors.blue,
-              onPressed: () {
+// class _AskPageState extends State<AskPage> {
+//   //stateful widget
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Ask a Question'),
+//       ),
+//       body: Padding(
+//         padding: EdgeInsets.all(16.0),
+//         child: Column(
+//           children: [
+//             TextFormField(
+//               decoration: InputDecoration(
+//                 labelText: 'Enter your question',
+//               ),
+//               keyboardType: TextInputType.text,
+//             ),
+//             SizedBox(height: 20),
+//             TextRoundedBox(
+//               text: 'Submit',
+//               color: Colors.blue,
+//               onPressed: () {

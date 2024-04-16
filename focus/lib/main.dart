@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:focus/firebase_options.dart';
 import 'package:focus/overlays/main_menu.dart';
 import 'package:focus/sudoku.dart';
@@ -38,6 +39,8 @@ import 'ai.dart';
 import 'profile_page.dart';
 import 'widgets/buttons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'chat.dart';
+import 'breathe_game.dart';
 
 
 const checkAppUsage = "checkAppUsage";
@@ -115,12 +118,14 @@ Future<void> main() async {
             FriendRequestsPage(currentUserId: email),
         '/map': (context) => MapPage(),
         '/sudoku': (context) => SudokuPage(currentUserId: email),
-        '/game': (context) => GameScreen(),
-        '/inviteFriend': (context) => InviteFriendPage(currentUserId: email),
+        '/game': (context) => GameScreen(init_health: 10,),
+        // '/inviteFriend': (context) => InviteFriendPage(currentUserId: email),
         '/challenges': (context) => ChallengePage(currentUserId: email),
         '/acceptedChallenges': (context) => AcceptedChallenges(currentUserId: email),
         '/issueChallenge': (context) => IssueChallenge(currentUserId: email),
         '/profilePage': (context) => ProfilePage(currentUserId: email),
+        '/chat' :(context) => ChatPage(start_message: "babushka",),
+        '/breathe': (context) => BreatheGame(),
       },
     ),
   );
@@ -314,7 +319,8 @@ class SearchBar extends StatelessWidget {
     );
               } else {
                 // Perform search operation
-                print('Searching for: $value');
+                // NavigationBar.pushNamed(start_message: value,);
+                 Navigator.pushNamed(context, '/chat', arguments: value);
               }
             },
           ),
@@ -331,9 +337,43 @@ class SearchBar extends StatelessWidget {
 //   void initState() {
 //     super.initState();
 //   }
-class HomeScreen extends StatelessWidget {
+
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+
+
+class _HomeScreenState extends State<HomeScreen> {
+
+
+@override
+  void initState() {
+    super.initState();
+    // userDataFuture = getUserData(widget.emailID);
+    // Locking the orientation to portrait mode
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+  }
+
+@override
+  void dispose() {
+    // Unlocking orientation changes back to default (rotational)
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Future<void> _signOut() async {
+    //   await FirebaseAuth.instance.signOut();
+    // }
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
@@ -343,6 +383,13 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {},
+          ),
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+              Navigator.pushNamed(context, '/');
+            },
           ),
         ],
       ),
@@ -354,6 +401,8 @@ class HomeScreen extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: SearchBar(),
         ),
+          // Padding(padding: const EdgeInsets.all(12.0), child: Text(getResponse(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+
         //Gap(16),
 
             Expanded(
@@ -364,7 +413,7 @@ class HomeScreen extends StatelessWidget {
                 childAspectRatio: 1.0,
                 children: <Widget>[
                   _buildCard(
-                    color: Color.fromARGB(255, 255, 105, 97),
+                    color: Color.fromARGB(255, 255, 105, 97),       
                     icon: Icons.track_changes,
                     label: 'Track Usage',
                     route: '/track',
@@ -391,6 +440,20 @@ class HomeScreen extends StatelessWidget {
                     route: '/challenges',
                     context: context
                   ),
+                  _buildCard(
+                    color: Color.fromARGB(255, 255, 105, 97),
+                    icon: Icons.chat_bubble,
+                    label: 'Focus Bot',
+                    route: '/chat',
+                    context: context
+                  ),
+                  _buildCard(
+                    color: Color.fromARGB(255, 255, 105, 97),
+                    icon: Icons.games,
+                    label: 'Breathe',
+                    route: '/breathe',
+                    context: context
+                  ),
                 ],
               ),
             ),
@@ -400,6 +463,10 @@ class HomeScreen extends StatelessWidget {
 SingleChildScrollView(
   scrollDirection: Axis.horizontal,
   child: Row(children: [ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/chat'),
+                  child: Text('Chat'),
+                ),
+    ElevatedButton(
                   onPressed: () => Navigator.pushNamed(context, '/register'),
                   child: Text('Register'),
                 ),

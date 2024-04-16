@@ -16,10 +16,23 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
+import 'package:installed_apps/installed_apps.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'appicon.dart';
 // import 'package:pdf/pdf.dart';
 // import 'package:pdf/widgets.dart' as pw;
 // import 'package:printing/printing.dart';
+
+Future<Map<String,int>> getDayAppUsageInMinutes() async {
+  DateTime endTime = DateTime.now();
+  DateTime startTime = DateTime(endTime.year, endTime.month, endTime.day,0,0,0);
+  List<AppUsageInfo> infoList = await AppUsage().getAppUsage(startTime, endTime);
+  Map<String,int> appUsageMinutes = {};
+  for (AppUsageInfo appUsageInfo in infoList) {
+    appUsageMinutes[appUsageInfo.packageName] = appUsageInfo.usage.inMinutes;
+  }
+  return appUsageMinutes;
+}
 
 
 Future<String?> getDownloadPath() async {
@@ -29,8 +42,6 @@ Future<String?> getDownloadPath() async {
         directory = await getApplicationDocumentsDirectory();
       } else {
         directory = Directory('/storage/emulated/0/Download');
-        // Put file in global download folder, if for an unknown reason it didn't exist, we fallback
-        // ignore: avoid_slow_async_io
         if (!await directory.exists()) directory = await getExternalStorageDirectory();
       }
     } catch (err, stack) {
@@ -82,17 +93,6 @@ void createUsagePDF(List<AppUsageInfo> appUsage, String filename, String suggest
               );
             })
         ),
-          // pw.ListView.builder(
-          //     itemCount: appUsage.length,
-          //     itemBuilder: (context, index) {
-          //       final item = appUsage[index];
-          //       return pw.Column(
-          //                     crossAxisAlignment: pw.CrossAxisAlignment.start,
-          //                     children: [
-          //                       pw.Text(item.appName, style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-          //                       pw.Text(item.usage.inMinutes.toString(), style: pw.TextStyle(fontSize: 10)),
-          //                     ]);
-          //     }),
           pw.Padding(
               padding: pw.EdgeInsets.only(top: 10),
               child: pw.Text(suggestions)),
@@ -146,10 +146,11 @@ class _TrackPageState extends State<TrackPage> {
 
   Future<void> initAsync() async {
     await getUsageStats();
-    Map<int,int> hourlyUsageComputed = await hourlyUsage();
-    barGroups = getBarGroups(hourlyUsageComputed);
+    // Map<int,int> hourlyUsageComputed = await hourlyUsage();
+    // barGroups = getBarGroups(hourlyUsageComputed);
     uploadUsageStats();
-    suggestions = await getResponse("The user has following appusage times:"+appUsageMinutes.toString()+"Please suggest in detail 10000 words for the user in as many words as possible");
+    suggestions = await getResponse("The user has following App Usage times:"+appUsageMinutes.toString()+"Please suggest in detail 10000 words for the user in as many words as possible");
+    //suggestions = "aapke liye kuch nahi";
     setState(() {});
   }
 
@@ -164,7 +165,7 @@ class _TrackPageState extends State<TrackPage> {
   Future<void> getUsageStats() async {
     try {
       DateTime endDate = DateTime.now();
-      DateTime startDate = DateTime(endDate.year, endDate.month, endDate.day - 1);
+      DateTime startDate = endDate.subtract(Duration(hours: 24));
       List<AppUsageInfo> infoList = await AppUsage().getAppUsage(startDate, endDate);
       setState (() {
         infoList.sort((a, b) => b.usage.inMinutes.compareTo(a.usage.inMinutes));
@@ -179,40 +180,33 @@ class _TrackPageState extends State<TrackPage> {
     }
   }
 
-List<String> packagesBlock = ['com.whatsapp','com.google.android.youtube', 'com.instagram.android'];
 
-  Future<Map<int,int>> hourlyUsage() async {
-    DateTime now = DateTime.now();
-    DateTime start = DateTime(now.year, now.month, now.day, 0, 0, 0);
-    int hour = now.hour;
-    Map<int, int> hourlyUsage = {};
-    for (int i = 0; i < hour; i++) {
-      DateTime end = start.add(Duration(hours: i + 1));
-      List<AppUsageInfo> infoList = await AppUsage().getAppUsage(start, end);
-      int totalUsage = 0;
-      for (AppUsageInfo info in infoList) {
-        if (packagesBlock.contains(info.packageName)) {
-          totalUsage += info.usage.inMinutes;
-        }
-      }
-      hourlyUsage[i] = totalUsage;
+  String totalUsageInHoursandMinutes(List<AppUsageInfo> info) {
+    int totalUsage = 0;
+    for (AppUsageInfo appUsageInfo in info) {
+      totalUsage += appUsageInfo.usage.inMinutes;
     }
-    return hourlyUsage; 
+    int hours = totalUsage ~/ 60;
+    int minutes = totalUsage % 60;
+    return '$hours hr, $minutes min';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Dashboard"),
+        title: Text("Activity Dashboard"),
         // backgroundColor: Colors.black,
         actions: [
           IconButton(
             icon: Icon(Icons.download),
             onPressed: () async {
-              createUsagePDF(info, "example_screen_time_report.pdf", suggestions);
-              // await FirebaseAuth.instance.signOut();
-              // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
+              createUsagePDF(info, "focus_screen_time_report.pdf", suggestions);
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.share),
+            onPressed: () async {
             },
           ),
         ],
@@ -220,39 +214,46 @@ List<String> packagesBlock = ['com.whatsapp','com.google.android.youtube', 'com.
       // backgroundColor: Colors.black,
       body: SingleChildScrollView(
         child: 
-        suggestions == "Hello World!" ? Center(child: CircularProgressIndicator()) :
+        
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                'Screen time',
+                'Screen Time (calculated for the past 24 hours)',
                 style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
               ),
             ),
-            // Add your bar chart widget here
-            // You can use a package like fl_chart or charts_flutter to render charts
+
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                '3 hr, 8 min',
+                totalUsageInHoursandMinutes(info),
                 style: TextStyle(color: Colors.black, fontSize: 36),
               ),
             ),
             ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              itemCount: 6, // the number of items in your list
+              itemCount: 10, // the number of items in your list
               itemBuilder: (context, index) {
-                return ListTile(
-            title: Text(info[index].appName),
-            subtitle: Text(info[index].packageName),
-            trailing: Text(info[index].usage.inMinutes.toString() + ' minutes'),
-          );
+                return AppTile(packageName: info[index].packageName, text: info[index].usage.inMinutes.toString() + ' minutes');
               },
             ),
-            Padding(
+            suggestions == "Hello World!" ? Center(child: Column(
+              children: [
+                Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "Loading suggestions tailored for you...",
+              // print(suggestions);,
+                // style: TextStyle(color: Colors.white),
+              ),
+            ),
+                CircularProgressIndicator(),
+              ],
+            )) : Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 suggestions,

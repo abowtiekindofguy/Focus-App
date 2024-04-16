@@ -10,9 +10,12 @@ enum HeartState {
 class HeartHealthComponent extends SpriteGroupComponent<HeartState>
     with HasGameReference<ChuckJumpGame> {
   final int heartNumber;
-
+  final heartImage;
+  final heartHalfImage; 
   HeartHealthComponent({
     required this.heartNumber,
+    required this.heartImage,
+    required this.heartHalfImage,
     required super.position,
     required super.size,
     super.scale,
@@ -25,12 +28,12 @@ class HeartHealthComponent extends SpriteGroupComponent<HeartState>
   Future<void> onLoad() async {
     await super.onLoad();
     final availableSprite = await game.loadSprite(
-      'heart.png',
+      heartImage,
       srcSize: Vector2.all(32),
     );
 
     final unavailableSprite = await game.loadSprite(
-      'heart_half.png',
+      heartHalfImage,
       srcSize: Vector2.all(32),
     );
 
@@ -48,6 +51,9 @@ class HeartHealthComponent extends SpriteGroupComponent<HeartState>
       current = HeartState.unavailable;
     } else {
       current = HeartState.available;
+    }
+    if(game.health == 0){
+      removeFromParent();
     }
     super.update(dt);
   }

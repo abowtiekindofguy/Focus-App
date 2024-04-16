@@ -5,7 +5,11 @@ import '../chuck_jump.dart';
 import 'heart.dart';
 
 class Hud extends PositionComponent with HasGameReference<ChuckJumpGame> {
+  final String heartImage;
+  final String heartHalfImage; 
   Hud({
+    required this.heartImage,
+    required this.heartHalfImage, 
     super.position,
     super.size,
     super.scale,
@@ -14,7 +18,7 @@ class Hud extends PositionComponent with HasGameReference<ChuckJumpGame> {
     super.children,
     super.priority = 5,
   });
-
+  
   late TextComponent _scoreTextComponent;
 
   @override
@@ -49,6 +53,8 @@ class Hud extends PositionComponent with HasGameReference<ChuckJumpGame> {
           heartNumber: i,
           position: Vector2(positionX.toDouble(), 20),
           size: Vector2.all(32),
+          heartImage: heartImage,
+          heartHalfImage: heartHalfImage,
         ),
       );
     }

@@ -29,7 +29,7 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          const Flexible(flex: 2, child: _TopPortion()),
+           Flexible(flex: 2, child: _TopPortion(currentUserId: currentUserId,)),
           Flexible(
             flex: 3,
             child: Padding(
@@ -158,6 +158,68 @@ class _ProfileInfoRow extends StatelessWidget {
       );
 }
 
+
+class InviteFriendPage extends StatelessWidget {
+  final String currentUserId;
+  final TextEditingController emailController = TextEditingController();
+
+  InviteFriendPage({required this.currentUserId});
+
+  @override
+  Widget build(BuildContext context) {
+    final usersRef = FirebaseFirestore.instance.collection('users');
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Invite Friends'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+        TextFormField(
+          controller: emailController,
+          validator: (value) => Validator.validateEmail(
+                          email: value,
+                        ),
+          decoration: InputDecoration(
+            labelText: 'Enter your friend\'s Focus ID',
+            suffixIcon: IconButton(
+          icon: Icon(Icons.send),
+          onPressed: () {
+            if (emailController.text.isNotEmpty) {
+              sendFriendRequest(emailController.text, currentUserId);
+              emailController.clear(); // Clear the text field after sending request
+            }
+          },
+            ),
+          ),
+          keyboardType: TextInputType.emailAddress,
+        ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> sendFriendRequest(String receiverId, String senderId) async {
+    await FirebaseFirestore.instance.collection('friendRequests').add({
+      'senderId': senderId,
+      'receiverId': receiverId,  // Typo corrected from 'recieverId' to 'receiverId'
+      'status': 'pending',
+    });
+    //when the friend request is sent, user will receive a local notification
+              FlutterLocalNotificationsPlugin flip = FlutterLocalNotificationsPlugin();
+
+    var androidDetails = const AndroidNotificationDetails(
+                'channel_id', 'Friend Request Sent',
+                importance: Importance.max, priority: Priority.high, ticker: 'ticker');
+              var platformDetails = NotificationDetails(android: androidDetails);
+              await flip.show(0, 'Focus Friend Request Sent', 'Friend Request Sent to '+receiverId+"\nYour Friend List would be updated once the request is accepted", platformDetails);
+
+  }
+}
+
+
 class ProfileInfoItem {
   final String title;
   final int value;
@@ -165,7 +227,8 @@ class ProfileInfoItem {
 }
 
 class _TopPortion extends StatelessWidget {
-  const _TopPortion({Key? key}) : super(key: key);
+  final String currentUserId;
+  const _TopPortion({Key? key, required this.currentUserId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
