@@ -23,6 +23,7 @@ import 'track.dart';
 import 'validator.dart';
 import 'package:localstorage/localstorage.dart';
 import 'widgets/row_button.dart';
+import 'firebase_map.dart';
 
 
 List<String> packagesBlock = ['com.whatsapp','com.google.android.youtube', 'com.instagram.android', 'com.twitter.android', 'com.facebook.katana', 'com.snapchat.android', 'com.tinder', 'com.linkedin.android', 'com.pinterest', 'com.reddit.frontpage', 'com.spotify.music' ];
@@ -90,7 +91,8 @@ Future<double> getScore() async {
        score += (appUsageinMinutes[packageName] ?? 0) / 60;
     }
   }
-  return score;
+  int activeChallenges = await numActiveChallenges();
+  return (score/activeChallenges)*100;
 }
 
 Future<void> issueChallenge(String challengeName, Map<String, dynamic> challenge, String currentUserId) async {

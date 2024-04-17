@@ -6,9 +6,6 @@ import '../chuck_environment/star.dart';
 import 'package:flame/components.dart';
 
 class Block {
-  // gridPosition position is always segment based X,Y.
-  // 0,0 is the bottom left corner.
-  // 10,10 is the upper right corner.
   final Vector2 gridPosition;
   final Type blockType;
   Block(this.gridPosition, this.blockType);

@@ -107,12 +107,6 @@ class MainMenu extends StatelessWidget {
                 fontStyle: FontStyle.values[0],
               ),
             ),
-            // const SizedBox(height: 10),
-            // Icon(
-            //   Icons.add,
-            //   color: textColor,
-            //   size: 40,
-            // ),
           ],
         ),
       ),

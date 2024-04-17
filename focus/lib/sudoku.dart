@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:math';
 import 'update_game.dart';
 import 'package:flutter/services.dart';
+import 'firebase_map.dart';
 
 class Sudoku {
   late List<List<int>> mat;
@@ -472,8 +473,16 @@ class _SudokuPageState extends State<SudokuPage> {
                       bool isValid = _sudokuGame.checkSudoku();
                       if (isValid) {
                         int _score = 10000 ~/ _seconds;
-                        GameStatistics().setGameScore(
-                            'sudokuGame', widget.currentUserId, _score);
+                        DateTime todayDate = DateTime.now();
+                        String dateSlug = todayDate.year.toString() +
+                            '-' +
+                            todayDate.month.toString() +
+                            '-' +
+                            todayDate.day.toString();
+                        setFirebaseValue(widget.currentUserId, 'sudokuGameScore', 'score', _score);
+                        setFirebaseValue(widget.currentUserId, 'sudokuGameScore', 'date', dateSlug);
+                        // GameStatistics().setGameScore(
+                        //     'sudokuGame', widget.currentUserId, _score);
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
