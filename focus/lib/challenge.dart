@@ -23,7 +23,7 @@ import 'track.dart';
 import 'validator.dart';
 import 'package:localstorage/localstorage.dart';
 import 'widgets/row_button.dart';
-
+import 'validator.dart';
 
 List<String> packagesBlock = ['com.whatsapp','com.google.android.youtube', 'com.instagram.android', 'com.twitter.android', 'com.facebook.katana', 'com.snapchat.android', 'com.tinder', 'com.linkedin.android', 'com.pinterest', 'com.reddit.frontpage', 'com.spotify.music' ];
 
@@ -112,7 +112,7 @@ Future<void> issueChallenge(String challengeName, Map<String, dynamic> challenge
 class IssueChallenge extends StatelessWidget {
   final String currentUserId;
   IssueChallenge({required this.currentUserId});
-  //only take duration in minutes give only the apps written in the packagesBlock
+
   final TextEditingController _challengeNameController = TextEditingController();
   final TextEditingController _challengeDescriptionController = TextEditingController();
   final TextEditingController _challengeDurationController = TextEditingController();
@@ -159,12 +159,7 @@ class IssueChallenge extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: 'Challenge Name',
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a challenge name';
-                }
-                return null;
-              },
+              validator: validateTextInput(value)
             ),
             TextFormField(
               controller: _challengeDescriptionController,
@@ -172,10 +167,7 @@ class IssueChallenge extends StatelessWidget {
                 labelText: 'Challenge Description',
               ),
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a challenge description';
-                }
-                return null;
+                validateTextInput(value);
               },
             ),
             TextFormField(
