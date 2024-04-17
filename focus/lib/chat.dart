@@ -15,6 +15,36 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:localstorage/localstorage.dart';
 import 'dart:io';
+import 'package:app_usage/app_usage.dart';
+// import 'package:pdf/pdf.dart' as pw;
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:open_file/open_file.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'main.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:app_usage/app_usage.dart';
+import 'storage.dart';
+import 'login.dart';
+import 'dart:convert';
+import 'package:intl/intl.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'ai.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:open_file/open_file.dart';
+import 'package:installed_apps/installed_apps.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'appicon.dart';
+import 'package:pair/pair.dart';  
 // void main() {
 //   initializeDateFormatting().then((_) => runApp(const MyApp()));
 // }
@@ -23,7 +53,8 @@ import 'dart:io';
 
 class ChatPage extends StatefulWidget {
   String start_message;
-  ChatPage({super.key, this.start_message = "babushka"});
+  // final String data;
+  ChatPage({super.key,this.start_message = "babushka"});
 
   @override
   State<ChatPage> createState() => _ChatPageState(start_message: start_message);
@@ -34,9 +65,11 @@ class _ChatPageState extends State<ChatPage> {
   _ChatPageState({required this.start_message});
 
   List<types.Message> _messages = [];
+  List<Pair<String,String>> _messagesList = [];
   bool _isLoading = false;
   final _user = const types.User(
     id: '82091008-a484-4a89-ae75-a22bf8d6f3ac',
+
     // id: '82091008-a484-4a89-ae75-a22bf7d6f3ac',
   );
 
@@ -47,7 +80,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void initState() {
-    
+    print("INIT STATE" + start_message);
     _loadMessages();
     if(start_message != "babushka"){simpleMessage(start_message);}
     super.initState();
@@ -56,65 +89,70 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
-    
+    initLocalStorage();
+    localStorage.setItem('messages', jsonEncode(_messages));
+    localStorage.setItem('messagesList', jsonEncode(_messagesList));
     super.dispose();
   } 
 
-  void _addMessage(types.Message message) {
+  Future<String?> getDownloadPath() async {
+    Directory? directory;
+    try {
+      if (Platform.isIOS) {
+        directory = await getApplicationDocumentsDirectory();
+      } else {
+        directory = Directory('/storage/emulated/0/Download');
+        if (!await directory.exists()) directory = await getExternalStorageDirectory();
+      }
+    } catch (err, stack) {
+      print("Cannot get download folder path");
+    }
+    return directory?.path;
+  }
+
+  void exportPDF(List<Pair<String,String>> messages, String filename) async { 
+  final pdf = pw.Document();
+  messages = messages.reversed.toList();
+   pdf.addPage(pw.MultiPage(
+      pageFormat: PdfPageFormat.a4,
+      margin: pw.EdgeInsets.all(32),
+      build: (pw.Context context) {
+        return <pw.Widget>[
+          pw.Wrap(  // Using Wrap to handle overflow properly
+            children: List<pw.Widget>.generate(messages.length, (index) {
+              final Pair<String,String> item = messages[index];
+              return pw.Container(
+                  width: double.infinity,
+                  margin: pw.EdgeInsets.only(bottom: 10),
+                  child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(item.key, style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        pw.Text(item.value),
+                      ]
+                  )
+              );
+            })
+        ),
+        ];
+      }));
+
+  final String downloadsDirectory = await getDownloadPath() ?? "";
+  final String path = '$downloadsDirectory/$filename';
+  final File file = File(path);
+  await file.writeAsBytes(await pdf.save());
+  print("PDF saved to $path");
+}
+
+
+
+  void _addMessage(types.Message message, String messageString, String authorName) {
     setState(() {
       _messages.insert(0, message);
+      _messagesList.insert(0, Pair<String,String>(authorName,messageString));
       initLocalStorage();
     localStorage.setItem('messages', jsonEncode(_messages));
-    });
-  }
-
-  void _handleImageSelection() async {
-    final result = await ImagePicker().pickImage(
-      imageQuality: 70,
-      maxWidth: 1440,
-      source: ImageSource.gallery,
-    );
-
-    if (result != null) {
-      final bytes = await result.readAsBytes();
-      final image = await decodeImageFromList(bytes);
-
-      final message = types.ImageMessage(
-        author: _user,
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        height: image.height.toDouble(),
-        id: const Uuid().v4(),
-        name: result.name,
-        size: bytes.length,
-        uri: result.path,
-        width: image.width.toDouble(),
-      );
-
-      final message2 = types.ImageMessage(
-        author: _chat,
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        height: image.height.toDouble(),
-        id: const Uuid().v4(),
-        name: result.name,
-        size: bytes.length,
-        uri: result.path,
-        width: image.width.toDouble(),
-      );
-      _addMessage(message);
-      _addMessage(message2);
-    }
-  }
-  void _handlePreviewDataFetched(
-    types.TextMessage message,
-    types.PreviewData previewData,
-  ) {
-    final index = _messages.indexWhere((element) => element.id == message.id);
-    final updatedMessage = (_messages[index] as types.TextMessage).copyWith(
-      previewData: previewData,
-    );
-
-    setState(() {
-      _messages[index] = updatedMessage;
+    localStorage.setItem('messagesList', jsonEncode(_messagesList));
     });
   }
 
@@ -123,7 +161,7 @@ class _ChatPageState extends State<ChatPage> {
       _isLoading = true;  // Start loading
     });
 
-    String responseText = await getResponse("Answer the following question in reference to productivity and focus and concentration and phone usage. If it does not relate it, simply answer Not Relevant \n"+message.text);
+    String responseText = await getResponse("You are a personal AI trainer that helps in focus, concentration, productivity and related things. If the question is highly irrelevant, politely say so. Here is the question: \n"+message.text);
 
     final textMessage = types.TextMessage(
       author: _user,
@@ -140,8 +178,8 @@ class _ChatPageState extends State<ChatPage> {
     );
 
     setState(() {
-      _addMessage(textMessage);
-      _addMessage(responseMessage);
+      _addMessage(textMessage, message.text, "You");
+      _addMessage(responseMessage, responseText, "Focus Bot");
       _isLoading = false;  // Stop loading
     });
   }
@@ -169,8 +207,8 @@ class _ChatPageState extends State<ChatPage> {
     );
 
     setState(() {
-      _addMessage(textMessage);
-      _addMessage(responseMessage);
+      _addMessage(textMessage, message, "You");
+      _addMessage(responseMessage,  responseText, "Focus Bot");
       _isLoading = false;  // Stop loading
     });
   }
@@ -182,15 +220,39 @@ class _ChatPageState extends State<ChatPage> {
     final messages = (jsonDecode(response) as List)
         .map((e) => types.Message.fromJson(e as Map<String, dynamic>))
         .toList();
+    final responseList = localStorage.getItem('messagesList') ?? '[]';
+    final messagesList = (jsonDecode(responseList) as List)
+        .map((e) => Pair<String,String>(e[0],e[1]))
+        .toList();
 
     setState(() {
       _messages = messages;
+      _messagesList = messagesList;
+    });
+  }
+
+  void _clearMessages() {
+    setState(() {
+      _messages = [];
+      localStorage.setItem('messages', jsonEncode(_messages));
+      _messagesList = []; 
+      localStorage.setItem('messagesList', jsonEncode(_messagesList));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Focus Bot'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: _clearMessages,
+          ),
+          IconButton(onPressed: () => exportPDF(_messagesList,"chat_with_focus_bot.pdf"), icon: const Icon(Icons.download))
+        ],
+      ),
       body: _isLoading
             ? Center(
               child: Column(
@@ -206,7 +268,7 @@ class _ChatPageState extends State<ChatPage> {
              )// Show loading indicator
           : Chat(
               messages: _messages,
-              onPreviewDataFetched: _handlePreviewDataFetched,
+              // onPreviewDataFetched: _handlePreviewDataFetched,
               onSendPressed: _handleSendPressed,
               user: _user,
               theme: const DefaultChatTheme(

@@ -41,6 +41,7 @@ import 'widgets/buttons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'chat.dart';
 import 'breathe_game.dart';
+import 'package:vibration/vibration.dart';
 
 
 const checkAppUsage = "checkAppUsage";
@@ -124,34 +125,12 @@ Future<void> main() async {
         '/acceptedChallenges': (context) => AcceptedChallenges(currentUserId: email),
         '/issueChallenge': (context) => IssueChallenge(currentUserId: email),
         '/profilePage': (context) => ProfilePage(currentUserId: email),
-        '/chat' :(context) => ChatPage(start_message: "babushka",),
+        '/chat' :(context) => ChatPage(start_message: "babushka"),
         '/breathe': (context) => BreatheGame(),
-      },
-    ),
-  );
-}
-
-// class HomeScreen extends StatefulWidget {
-//   @override
-//   _HomeScreenState createState() => _HomeScreenState();
-// }
-
-// Widget _buildCard({required Color color, required IconData icon, required String label}) {
-//   return Container(
-//     decoration: BoxDecoration(
-//       borderRadius: BorderRadius.circular(20),
-//       gradient: LinearGradient(
-//         begin: Alignment.topLeft,
-//         end: Alignment.bottomRight,
-//         colors: [
-//           color.withOpacity(0.8), // Lighter color at the top left
-//           color, // Original color
-//           color.withOpacity(0.9), // Slightly lighter color towards the bottom right
-//           Colors.white.withOpacity(0.2), // A touch of gloss at the bottom right
-//         ],
-//         stops: [
-//           0.0,
-//           0.55,
+            },
+          ),
+        );
+      }
 //           0.75,
 //           1.0,
 //         ],
@@ -287,6 +266,9 @@ Widget _buildCard({
 }
 
 class SearchBar extends StatelessWidget {
+  // Define a TextEditingController
+  final TextEditingController _controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -298,37 +280,50 @@ class SearchBar extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 20),
           child: TextField(
+            controller: _controller,  // Set the controller to the TextField
             decoration: InputDecoration(
-              hintText: "Get Personalized Suggestions, Search Now",
+              hintText: "Get Personalized Suggestions, Chat Now",
               contentPadding: EdgeInsets.symmetric(vertical: 16),
               border: InputBorder.none,
-              suffixIcon: Icon(Icons.search),
+              suffixIcon: IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () {
+                  _submitSearch(context);  // Call _submitSearch when the search icon is pressed
+                },
+              ),
             ),
             style: TextStyle(fontSize: 12),
             textInputAction: TextInputAction.search,
             onSubmitted: (value) {
-              if (value.isEmpty) {
-                Fluttertoast.showToast(
-        msg: "Please enter a search query before submitting!",
-        toastLength: Toast.LENGTH_SHORT,
-        // gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.black,
-        textColor: Colors.white,
-        fontSize: 12.0
-    );
-              } else {
-                // Perform search operation
-                // NavigationBar.pushNamed(start_message: value,);
-                 Navigator.pushNamed(context, '/chat', arguments: value);
-              }
+              
+              _submitSearch(context);  // Also handle submission on enter/key press
             },
           ),
         ),
       ),
     );
   }
+
+  void _submitSearch(BuildContext context) {
+    String value = _controller.text;  // Use the controller to get the text
+    if (value.isEmpty) {
+      Fluttertoast.showToast(
+        msg: "Please enter a search query before submitting!",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 12.0,
+      );
+    } else {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => ChatPage(start_message: value)),
+      );
+      _controller.clear();  // Clear the text field after submitting
+    }
+  }
 }
+
 
 // class _HomeScreenState extends State<HomeScreen> {
 //   late FlutterLocalNotificationsPlugin _notificationsPlugin;
@@ -378,7 +373,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        title: Text('Hi, Dimsest'),
+        title: Text('Hi, Let\'s  Focus!'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.settings),

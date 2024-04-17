@@ -7,6 +7,7 @@ import '../chuck_environment/platform_block.dart';
 import '../chuck_environment/star.dart';
 import '../chars/logo_enemy.dart';
 import '../chuck_jump.dart';
+import '../play_sound.dart';  
 
 class ChuckPlayer extends SpriteAnimationComponent
     with CollisionCallbacks ,HasGameReference<ChuckJumpGame>  {
@@ -123,6 +124,8 @@ void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     }
 
     if (other is LogoEnemy) {
+      //playLocalAsset('angry.mp3');
+      HapticFeedback.heavyImpact();
       hit();
     }
 
