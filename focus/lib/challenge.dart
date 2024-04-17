@@ -162,16 +162,14 @@ class IssueChallenge extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: 'Challenge Name',
               ),
-              validator: validateTextInput(value)
+              validator: (value) => Validator.validateTextInput(),
             ),
             TextFormField(
               controller: _challengeDescriptionController,
               decoration: InputDecoration(
                 labelText: 'Challenge Description',
               ),
-              validator: (value) {
-                validateTextInput(value);
-              },
+              validator: (value) => Validator.validateTextInput(),
             ),
             TextFormField(
               controller: _challengeDurationController,
