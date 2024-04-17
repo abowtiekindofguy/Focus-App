@@ -122,11 +122,4 @@ class ChuckBreathe extends FlameGame{
     _chuck.removeFromParent();
     initializeBreathe(true);
   }
-
-  // void set_time(double value){
-  //   if(slider_idx == 0) inhale_time = value;
-  //   else if(slider_idx == 1) hold_up_time = value;
-  //   else if(slider_idx == 2) exhale_time = value;
-  //   else if(slider_idx == 3) hold_down_time = value;
-  // }
 }
