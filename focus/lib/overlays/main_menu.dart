@@ -23,35 +23,47 @@ class MainMenu extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildMenuItem(
-          'Ground Surf',
-          blackTextColor,
+          'Plenty Plains',
+          Color.fromARGB(255, 66, 126, 154),
           whiteTextColor,
           () {
             game.set_theme(0);
+            game.startGame = false;
+            game.backgroundColor();
+            game.reset(true);
           },
           ),
           _buildMenuItem(
-          'Tech Mania',
-          blackTextColor,
+          'Ender City',
+          Color.fromARGB(255, 121, 62, 216),
           whiteTextColor,
           () {
             game.set_theme(1);
+            game.startGame = false;
+            game.backgroundColor();
+            game.reset(true);
           },
           ),
           _buildMenuItem(
-          'Cosmo Leap',
-          blackTextColor,
+          'The Dark Side of the Moon',
+          Color.fromARGB(255, 56, 56, 56),
           whiteTextColor,
           () {
             game.set_theme(2);
+            game.startGame = false;
+            game.backgroundColor();
+            game.reset(true);
           },
           ),
           _buildMenuItem(
           'Lava Lunge',
-          blackTextColor,
+          Color.fromARGB(255, 152, 30, 30),
           whiteTextColor,
           () {
             game.set_theme(3);
+            game.startGame = false;
+            game.backgroundColor();
+            game.reset(true);
           },
           ),
         ],
@@ -61,8 +73,8 @@ class MainMenu extends StatelessWidget {
         onPressed: () {
           game.overlays.remove('MainMenu');
           game.start_game();
-         // game.reset(true);
-         game.initializeGame(false);
+          game.reset(true);
+          // game.initializeGame(false);
         },
         child: Text(
           'Start Game',
@@ -107,6 +119,12 @@ class MainMenu extends StatelessWidget {
                 fontStyle: FontStyle.values[0],
               ),
             ),
+            // const SizedBox(height: 10),
+            // Icon(
+            //   Icons.add,
+            //   color: textColor,
+            //   size: 40,
+            // ),
           ],
         ),
       ),

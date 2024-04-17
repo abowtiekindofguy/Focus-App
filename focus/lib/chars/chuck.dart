@@ -1,4 +1,5 @@
 import 'package:flame/components.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/effects.dart';
@@ -7,7 +8,8 @@ import '../chuck_environment/platform_block.dart';
 import '../chuck_environment/star.dart';
 import '../chars/logo_enemy.dart';
 import '../chuck_jump.dart';
-import '../play_sound.dart';  
+import 'notif.dart';
+import 'shield.dart';
 
 class ChuckPlayer extends SpriteAnimationComponent
     with CollisionCallbacks ,HasGameReference<ChuckJumpGame>  {
@@ -21,7 +23,8 @@ class ChuckPlayer extends SpriteAnimationComponent
   final double terminalVelocity = 75;
   bool hitByEnemy = false;
   bool hasJumped = false;
-
+  bool shielded = false;
+  late final Shield _shield;
   ChuckPlayer({
     required super.position,
   }) : super(size: Vector2.all(32), anchor: Anchor.center);
@@ -37,23 +40,35 @@ class ChuckPlayer extends SpriteAnimationComponent
         stepTime: 0.12,
       ),
     );
+    _shield = Shield(position: position+Vector2(size.x/2, 0));
   }
 
   @override
   bool onKeyEvent(Set<int> keys) {
     horizontalDirection = 0;
-    horizontalDirection += (keys.contains(-1) ? -1: 0)*(keys.contains(2) ? 3 : 1);
-    horizontalDirection += (keys.contains(1) ? 1: 0)*(keys.contains(2) ? 3 : 1);
+    // horizontalDirection = (keys.contains(-1) ? -1: 0)*(keys.contains(2) ? 3 : 1);
+    horizontalDirection = (keys.contains(1) ? 1: 0) + (keys.contains(-1) ? -1: 0);
 
-    hasJumped = keys.contains(0);
-    
+    // hasJumped = keys.contains(0);
+    if(keys.isEmpty) horizontalDirection = 0;
+
     print(keys);
     print(horizontalDirection);
     return true;
   }
 
+  void jump_chuck(){
+    hasJumped = true;
+  }
+
   @override
   void update(double dt) {
+
+    if(shielded){
+      game.add(_shield);
+    } else {
+      _shield.removeFromParent();
+    }
     velocity.x = horizontalDirection * moveSpeed;
     
     if (horizontalDirection < 0 && scale.x > 0) {
@@ -88,9 +103,12 @@ class ChuckPlayer extends SpriteAnimationComponent
   }
 
   if (game.health <= 0) {
+    horizontalDirection = 0;
+    game.objectSpeed = 0;
     removeFromParent();
   }
   position += velocity * dt;
+  _shield.position = position+Vector2(size.x/2, 0);
   super.update(dt);
 
   }
@@ -123,10 +141,13 @@ void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
       game.starsCollected++;
     }
 
-    if (other is LogoEnemy) {
-      //playLocalAsset('angry.mp3');
-      HapticFeedback.heavyImpact();
+    if (other is LogoEnemy || other is ShooterEnemy) {
       hit();
+    }
+
+    if(other is Notif){
+      other.removeFromParent();
+      if(!shielded) hit();
     }
 
   super.onCollision(intersectionPoints, other);

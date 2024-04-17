@@ -15,7 +15,7 @@ import 'managers/segments.dart';
 import 'package:flutter/material.dart';
 
 class ChuckJumpGame extends FlameGame with HasCollisionDetection{
-  late ChuckPlayer _chuck;
+  late ChuckPlayer chuck;
   double objectSpeed = 0.0;
   late double lastBlockXPosition = 0.0;
   late UniqueKey lastBlockKey;
@@ -44,7 +44,17 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
       'button_left.png',
       'button_right.png',
       'button_booster.png',
+      'ground_tech.png',
+      'ground_moon.png',
+      'ground_lava.png',
+      'block_lava.png',
+      'block_tech.png',
+      'block_moon.png',
+      'notif.png',
+      'shield.png',
+      'sun.png',
     ]);
+    
     camera.viewfinder.anchor = Anchor.topLeft;
     camera.viewport.add(Hud(heartImage: 'heart.png', heartHalfImage: 'heart_half.png'));
     initializeGame(true);
@@ -52,8 +62,8 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
     leftButton = createButtonComponent(
       position: Vector2(70,300),
       size: Vector2.all(64),
-      onPressed: () => add_key(-1),
-      onReleased: () => remove_key(-1),
+      onPressed: () {if(!chuck.shielded) chuck.horizontalDirection = -1;},
+      onReleased: () => chuck.horizontalDirection = 0,
       direction: 'left',
     );
     add(leftButton);
@@ -62,27 +72,32 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
     rightButton = createButtonComponent(
       position: Vector2(150,300),
       size: Vector2.all(64),
-      onPressed: () => add_key(1),
-      onReleased: () => remove_key(1),
+      onPressed: () {if(!chuck.shielded) chuck.horizontalDirection = 1;},
+      onReleased: () => chuck.horizontalDirection = 0,
       direction: 'right',
     );
     add(rightButton);
 
     upButton = createButtonComponent(
-      position: Vector2(840, 300),
+      position: Vector2(760, 300),
       size: Vector2.all(64),
-      onPressed: () => add_key(0),
-      onReleased: () => remove_key(0),
+      onPressed: () => chuck.jump_chuck(),
+      onReleased: (){},
       direction: 'up',
     );
     add(upButton);
 
 
     boosterButton = createButtonComponent(
-      position: Vector2(840, 100),
+      position: Vector2(760, 100),
       size: Vector2.all(64),
-      onPressed: () => add_key(2),
-      onReleased: () => remove_key(2),
+      onPressed: (){
+        chuck.shielded = true;
+        chuck.horizontalDirection = 0;
+      },
+      onReleased: () {
+        chuck.shielded = false;
+      },
       direction: 'booster',
     );
     add(boosterButton);
@@ -91,12 +106,17 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
 
   void remove_key(int key){
     keys.remove(key);
-    _chuck.onKeyEvent(keys);
+    if(key.abs() == 1 || key == 0){
+      keys.remove(-key);
+      keys.remove(0);
+      keys.remove(2);
+    }
+    chuck.onKeyEvent(keys);
   }
 
   void add_key(int key){
     keys.add(key);
-    _chuck.onKeyEvent(keys);
+    chuck.onKeyEvent(keys);
   }
   
   @override
@@ -104,7 +124,7 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
     if(theme == 0){
       return const Color.fromARGB(255, 173, 223, 247);
     } else if(theme == 1){
-      return Color.fromARGB(255, 80, 3, 101);
+      return Color.fromARGB(255, 48, 2, 121);
     } else if(theme == 2){
       return Color.fromARGB(255, 0, 0, 0);
     } else if(theme == 3){
@@ -123,7 +143,7 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
             GroundBlock(
               gridPosition: block.gridPosition,
               xOffset: xPositionOffset,
-              blockImage: (theme == 0) ? 'ground.png' : 'block.png',
+              blockImage: (theme == 0) ? 'ground.png' : (theme == 1) ? 'ground_tech.png' : (theme == 2) ? 'ground_moon.png' : 'ground_lava.png',  
             ),
           );
           break;
@@ -131,6 +151,7 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
           add(PlatformBlock(
             gridPosition: block.gridPosition,
             xOffset: xPositionOffset,
+            blockImage: (theme == 0) ? 'block.png' : (theme == 1) ? 'block_tech.png' : (theme == 2) ? 'block_moon.png' : 'block_lava.png',  
           ));
           break;
         case Star:
@@ -152,6 +173,17 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
           );
           break;
         }
+
+        case ShooterEnemy:
+        if(startGame){
+          world.add(
+            ShooterEnemy(
+            gridPosition: block.gridPosition,
+            xOffset: xPositionOffset,
+            ),
+          );
+          break;
+        }
       }
     }
   }
@@ -160,16 +192,16 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
   // Assume that size.x < 3200
   final segmentsToLoad = (size.x / 640).ceil();
   segmentsToLoad.clamp(0, segments.length);
-
+  
   for (var i = 0; i <= segmentsToLoad; i++) {
     loadGameSegments(i, (640 * i).toDouble());
   }
   if(startGame){
-  _chuck = ChuckPlayer(
+  chuck = ChuckPlayer(
     position: Vector2(128, canvasSize.y - 128),
   );
   
-  add(_chuck);
+  add(chuck);
   if (loadHud) {
     add(Hud(heartImage: 'heart.png',heartHalfImage: 'heart_half.png'));
   } 
@@ -179,10 +211,10 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
 void reset(bool start) {
   starsCollected = 0;
   if(!start) {
-    health = 3;
+    health = 15;
     add(Hud(heartImage: 'heart.png',heartHalfImage: 'heart_half.png'));
   }
-  // initializeGame(false);
+  initializeGame(false);
 }
 
   void set_theme(int theme){
@@ -194,6 +226,7 @@ void reset(bool start) {
   void start_game(){
     startGame = true;
   }
+
 
   HudButtonComponent createButtonComponent({
     required Vector2 position,
@@ -209,10 +242,13 @@ void reset(bool start) {
         sprite: Sprite(Flame.images.fromCache('button_$direction.png')),
       )]), 
       onReleased:() => onReleased(),
+      onCancelled: () => onReleased(),
       onPressed: onPressed,
       anchor: Anchor.center,
       priority: 1,
     );
+
+    
   }
 
   @override

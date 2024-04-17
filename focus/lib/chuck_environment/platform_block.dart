@@ -8,15 +8,16 @@ class PlatformBlock extends SpriteComponent
   final Vector2 velocity = Vector2.zero();
   final Vector2 gridPosition;
   double xOffset;
-
+  final String blockImage;
   PlatformBlock({
     required this.gridPosition,
     required this.xOffset,
+    required this.blockImage,
   }) : super(size: Vector2.all(32), anchor: Anchor.bottomLeft);
 
   @override
   void onLoad() {
-    final platformImage = game.images.fromCache('block.png');
+    final platformImage = game.images.fromCache(blockImage);
     sprite = Sprite(platformImage);
     position = Vector2((gridPosition.x * size.x) + xOffset,
         game.size.y - (gridPosition.y * size.y),

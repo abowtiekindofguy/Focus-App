@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 // import 'p/chuck_jump.dart';
 
 import '../chuck_jump.dart';
-import '../firebase_map.dart';  
 
 class GameOver extends StatelessWidget {
   // Reference to parent game.
@@ -15,7 +14,7 @@ class GameOver extends StatelessWidget {
     const whiteTextColor = Color.fromRGBO(255, 255, 255, 1.0);
 
     return Material(
-      color: Colors.transparent,
+      color: Color.fromRGBO(34, 1, 66, 1),
       child: Center(
         child: Container(
           padding: const EdgeInsets.all(10.0),
@@ -43,8 +42,8 @@ class GameOver extends StatelessWidget {
                 height: 75,
                 child: ElevatedButton(
                   onPressed: () {
+                    game.startGame = false;
                     game.reset(false);
-                    setFirebaseValue("akshat@gmail.com", 'chuckGameScore', 'score', 20);
                     game.overlays.remove('GameOver');
                     game.overlays.add('MainMenu');
                   },

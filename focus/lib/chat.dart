@@ -16,6 +16,8 @@ import 'package:uuid/uuid.dart';
 import 'package:localstorage/localstorage.dart';
 import 'dart:io';
 import 'package:app_usage/app_usage.dart';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 // import 'package:pdf/pdf.dart' as pw;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -91,7 +93,7 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     initLocalStorage();
     localStorage.setItem('messages', jsonEncode(_messages));
-    localStorage.setItem('messagesList', jsonEncode(_messagesList));
+    // localStorage.setItem('messagesList', jsonEncode(_messagesList));
     super.dispose();
   } 
 
@@ -152,7 +154,7 @@ class _ChatPageState extends State<ChatPage> {
       _messagesList.insert(0, Pair<String,String>(authorName,messageString));
       initLocalStorage();
     localStorage.setItem('messages', jsonEncode(_messages));
-    localStorage.setItem('messagesList', jsonEncode(_messagesList));
+    // localStorage.setItem('messagesList', jsonEncode(_messagesList));
     });
   }
 
