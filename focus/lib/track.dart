@@ -19,9 +19,6 @@ import 'package:open_file/open_file.dart';
 import 'package:installed_apps/installed_apps.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'appicon.dart';
-// import 'package:pdf/pdf.dart';
-// import 'package:pdf/widgets.dart' as pw;
-// import 'package:printing/printing.dart';
 
 Future<Map<String,int>> getDayAppUsageInMinutes() async {
   DateTime endTime = DateTime.now();
@@ -33,6 +30,47 @@ Future<Map<String,int>> getDayAppUsageInMinutes() async {
   }
   return appUsageMinutes;
 }
+  
+
+Future<String> getDayAppUsageInMinutesString() async {
+  DateTime endTime = DateTime.now();
+  DateTime startTime = DateTime(endTime.year, endTime.month, endTime.day,0,0,0);
+  List<AppUsageInfo> infoList = await AppUsage().getAppUsage(startTime, endTime);
+ int appUsageMinutes = 0;
+  for (AppUsageInfo appUsageInfo in infoList) {
+    appUsageMinutes+=appUsageInfo.usage.inMinutes;
+  }
+
+  int min = appUsageMinutes;
+  return (min~/60).toString() + " hr " + (min%60).toString() + " min";
+}
+
+Future<String> getWeekAppUsageInMinutesString() async {
+  DateTime endTime = DateTime.now();
+  DateTime startTime = endTime.subtract(Duration(days: 7));
+  List<AppUsageInfo> infoList = await AppUsage().getAppUsage(startTime, endTime);
+  int appUsageMinutes = 0;
+  for (AppUsageInfo appUsageInfo in infoList) {
+    appUsageMinutes+=appUsageInfo.usage.inMinutes;
+  }
+
+  int min = appUsageMinutes;
+  return (min~/60).toString() + " hr " + (min%60).toString() + " min";
+}
+
+Future<String> getMonthAppUsageInMinutesString() async {
+  DateTime endTime = DateTime.now();
+  DateTime startTime = endTime.subtract(Duration(days: 30));
+  List<AppUsageInfo> infoList = await AppUsage().getAppUsage(startTime, endTime);
+  int appUsageMinutes = 0;
+  for (AppUsageInfo appUsageInfo in infoList) {
+    appUsageMinutes+=appUsageInfo.usage.inMinutes;
+  }
+
+  int min = appUsageMinutes;
+  return (min~/60).toString() + " hr " + (min%60).toString() + " min";
+}
+
 
 Future<Map<int,int>> hourlyUsage() async {
   DateTime endTime = DateTime.now();

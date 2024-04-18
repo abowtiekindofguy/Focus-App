@@ -74,9 +74,10 @@ Future<void> addChallengeToLocal(String challengeId, Map<String, dynamic> challe
   localStorage.setItem('challengesCollection', jsonEncode(challengesCollection));
 }
 
-Future<double> getScore() async {
+Future<double> getChallengeScore() async {
   Map<String,int> appUsageinMinutes = await getDayAppUsageInMinutes();
   Map<String,int> challengeMinimum = await getAllChallengeMinimum();
+  print(challengeMinimum);
   double score = 0;
   for (String packageName in packagesBlock){
     int appUsage = appUsageinMinutes[packageName] ?? 0;
@@ -234,7 +235,7 @@ class IssueChallenge extends StatelessWidget {
                 }
                 final numActive = snapshot.data ?? 0; // Default to 0 if data is null
                 return FutureBuilder<double>(
-                  future: getScore(),
+                  future: getChallengeScore(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState != ConnectionState.done) {
                       return const CircularProgressIndicator(); // Show loading indicator while data is fetching
