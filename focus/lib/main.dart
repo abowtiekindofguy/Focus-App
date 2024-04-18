@@ -43,6 +43,7 @@ import 'chat.dart';
 import 'breathe_game.dart';
 import 'package:vibration/vibration.dart';
 import 'levels.dart';
+import 'widgets/row_button.dart ';
 
 const checkAppUsage = "checkAppUsage";
 const fetchParentalControl = "fetchParentalControl";
@@ -399,7 +400,38 @@ class _HomeScreenState extends State<HomeScreen> {
           // Padding(padding: const EdgeInsets.all(12.0), child: Text(getResponse(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
 
         //Gap(16),
+            FutureBuilder(
+              future: Future.wait([
+                getDayAppUsageInMinutesString(),
+                getWeekAppUsageInMinutesString(),
+                getMonthAppUsageInMinutesString(),
+              ]),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return InfoRow(info: {
+                    'Day Usage': snapshot.data![0] ?? '-',
+                    'Week Usage': snapshot.data![1] ?? '-',
+                    'Month Usage': snapshot.data![2]  ?? '-',
+                  });
+                }
+              },
+            ),
 
+            FutureBuilder(future: Future.wait([getChallengeScore()]), builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                return InfoRow(info: {
+                  'Challenge Score': snapshot.data![0].toStringAsFixed(2) ?? '-',
+                });
+              }
+            }),
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
@@ -523,119 +555,3 @@ SingleChildScrollView(
 
   
 }
-
-
-//   @override
-//   Widget build(BuildContext context) {
-
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Home Screen'),
-//       ),
-//       body: SingleChildScrollView(
-//         child: Center(
-//           child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: <Widget>[
-// GridView.count(
-//         crossAxisCount: 2,
-//         childAspectRatio: 3 / 2, // Adjusts the aspect ratio of the buttons
-//         mainAxisSpacing: 10, // Spacing between rows
-//         crossAxisSpacing: 10, // Spacing between columns
-//         padding: EdgeInsets.all(10), // Padding around the grid
-//         children: <Widget>[
-//           MainMenuRoundedButton(
-//             text: "Home",
-//             icon: Icons.home,
-//             color: Colors.blue,
-//             onPressed: () => print("Home Pressed"),
-//           ),
-//           MainMenuRoundedButton(
-//             text: "Settings",
-//             icon: Icons.settings,
-//             color: Colors.red,
-//             onPressed: () => print("Settings Pressed"),
-//           ),
-//           MainMenuRoundedButton(
-//             text: "Profile",
-//             icon: Icons.person,
-//             color: Colors.green,
-//             onPressed: () => print("Profile Pressed"),
-//           ),
-//           MainMenuRoundedButton(
-//             text: "Messages",
-//             icon: Icons.message,
-//             color: Colors.orange,
-//             onPressed: () => print("Messages Pressed"),
-//           ),
-//         ],
-//       ),
-
-
-
-
-
-
-//               Text(
-//                 'Welcome to the Home Screen',
-//                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () => Navigator.pushNamed(context, '/register'),
-//                 child: Text('Register'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () => Navigator.pushNamed(context, '/track'),
-//                 child: Text('Track'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () => Navigator.pushNamed(context, '/friends'),
-//                 child: Text('Friends'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () =>
-//                     Navigator.pushNamed(context, '/friendrequests'),
-//                 child: Text('Friend Requests'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () => Navigator.pushNamed(context, '/map'),
-//                 child: Text('Map'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () => Navigator.pushNamed(context, '/sudoku'),
-//                 child: Text('Sudoku'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () => Navigator.pushNamed(context, '/game'),
-//                 child: Text('Chuck Jump'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () => Navigator.pushNamed(context, '/inviteFriend'),
-//                 child: Text('Invite Friends'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () => Navigator.pushNamed(context, '/challenges'),
-//                 child: Text('Challenges'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () =>
-//                     Navigator.pushNamed(context, '/acceptedChallenges'),
-//                 child: Text('Accepted Challenges'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () =>
-//                     Navigator.pushNamed(context, '/issueChallenge'),
-//                 child: Text('Issue Challenge'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () =>
-//                     Navigator.pushNamed(context, '/profilePage'),
-//                 child: Text('Profile Page'),
-//               ),
-//             ],
-            
-//           ),
-//         ),
-//       ),
-//     );
-//   }}
