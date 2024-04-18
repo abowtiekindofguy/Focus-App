@@ -42,7 +42,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'chat.dart';
 import 'breathe_game.dart';
 import 'package:vibration/vibration.dart';
-
+import 'levels.dart';
 
 const checkAppUsage = "checkAppUsage";
 const fetchParentalControl = "fetchParentalControl";
@@ -119,7 +119,7 @@ Future<void> main() async {
             FriendRequestsPage(currentUserId: email),
         '/map': (context) => MapPage(),
         '/sudoku': (context) => SudokuPage(currentUserId: email),
-        '/game': (context) => GameScreen(init_health: 10,),
+        '/game': (context) => LevelsPage(),
         // '/inviteFriend': (context) => InviteFriendPage(currentUserId: email),
         '/challenges': (context) => ChallengePage(currentUserId: email),
         '/acceptedChallenges': (context) => AcceptedChallenges(currentUserId: email),

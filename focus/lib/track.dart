@@ -37,13 +37,14 @@ Future<Map<String,int>> getDayAppUsageInMinutes() async {
 Future<Map<int,int>> hourlyUsage() async {
   DateTime endTime = DateTime.now();
   DateTime startTime = endTime.subtract(Duration(hours: 24));
+  Map<int,int> hourlyUsage = {};
   for (int i = 0; i < 24; i++) {
     DateTime hourStart = startTime.add(Duration(hours: i));
     DateTime hourEnd = startTime.add(Duration(hours: i+1));
     List<AppUsageInfo> infoList = await AppUsage().getAppUsage(hourStart, hourEnd);
     int totalUsage = 0;
     for (AppUsageInfo appUsageInfo in infoList) {
-      if (appUsageInfo.usage.inMinutes > 1 and appUsageInfo.packageName != "com.example.focus")
+      if (appUsageInfo.usage.inMinutes > 1 && appUsageInfo.packageName != "com.example.focus")
           totalUsage += appUsageInfo.usage.inMinutes;
     }
     hourlyUsage[i] = totalUsage;

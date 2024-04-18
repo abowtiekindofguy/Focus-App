@@ -72,6 +72,7 @@ class MainMenu extends StatelessWidget {
               game.reset(true);
             },
             ),
+            SizedBox(height: 20),
             _buildMenuItem(
             'Ender City',
             Color.fromARGB(255, 121, 62, 216),
@@ -83,6 +84,7 @@ class MainMenu extends StatelessWidget {
               game.reset(true);
             },
             ),
+            SizedBox(height: 20),
             _buildMenuItem(
             'The Dark Side of the Moon',
             Color.fromARGB(255, 56, 56, 56),
@@ -94,6 +96,7 @@ class MainMenu extends StatelessWidget {
               game.reset(true);
             },
             ),
+            SizedBox(height: 20),
             _buildMenuItem(
             'Lava Lunge',
             Color.fromARGB(255, 152, 30, 30),
