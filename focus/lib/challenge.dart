@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:focus/appIcon.dart';
+import 'package:focus/appicon.dart';
 import 'package:focus/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login.dart';
