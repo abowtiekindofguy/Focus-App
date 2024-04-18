@@ -30,6 +30,8 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
   int health;
   int theme = 0;
   bool startGame = false;
+  double fire_speed = 1.5;
+  int score_to_achieve = 20;
   ChuckJumpGame({required this.health});
   @override
   Future<void> onLoad() async {
@@ -168,8 +170,8 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
         if(startGame){
           world.add(
             LogoEnemy(
-            gridPosition: block.gridPosition,
-            xOffset: xPositionOffset,
+              gridPosition: block.gridPosition,
+              xOffset: xPositionOffset,
             ),
           );
           break;
@@ -179,8 +181,9 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
         if(startGame){
           world.add(
             ShooterEnemy(
-            gridPosition: block.gridPosition,
-            xOffset: xPositionOffset,
+              gridPosition: block.gridPosition,
+              xOffset: xPositionOffset,
+              fire_speed: fire_speed,
             ),
           );
           break;
@@ -254,7 +257,7 @@ void reset(bool start) {
 
   @override
   void update(double dt) {
-    if (health <= 0) {
+    if (health <= 0 || starsCollected == score_to_achieve) {
       overlays.add('GameOver');
     }
     super.update(dt);

@@ -58,7 +58,9 @@ class LogoEnemy extends SpriteAnimationComponent
 class ShooterEnemy extends LogoEnemy{
   late final SpawnComponent _bulletSpawner;
   bool shoot_power = false;
+  double fire_speed;
   ShooterEnemy({
+    required this.fire_speed,
     required super.gridPosition,
     required super.xOffset,
   });
@@ -89,7 +91,7 @@ class ShooterEnemy extends LogoEnemy{
       ),
     );
     _bulletSpawner = SpawnComponent(
-      period: 2,
+      period: fire_speed,
       selfPositioning: true,
       factory: (index) {
         return Notif(

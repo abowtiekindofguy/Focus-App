@@ -18,7 +18,7 @@ class Instructions extends StatelessWidget {
       child: Center(
         child: Container(
           padding: const EdgeInsets.all(10.0),
-          height: 300,
+          height: 350,
           width: 700,
           decoration: const BoxDecoration(
             color: blackTextColor,
@@ -31,7 +31,7 @@ class Instructions extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Text(
-                'Instructions:',
+                'Instructions',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: whiteTextColor,
@@ -46,7 +46,7 @@ class Instructions extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-
+              SizedBox(height: 30,),
               SizedBox(
                 width: 200,
                 height: 70,
