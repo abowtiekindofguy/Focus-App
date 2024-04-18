@@ -93,7 +93,10 @@ Future<double> getScore() async {
     }
   }
   int activeChallenges = await numActiveChallenges();
-  return (score/activeChallenges)*100;
+  if (activeChallenges == 0){
+    return score/(packagesBlock.length) * 100;
+  }
+  return (score/(packagesBlock.length))*100;
 }
 
 Future<void> issueChallenge(String challengeName, Map<String, dynamic> challenge, String currentUserId) async {
