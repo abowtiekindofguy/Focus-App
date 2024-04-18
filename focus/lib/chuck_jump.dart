@@ -24,6 +24,7 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
   late final HudButtonComponent rightButton;
   late final HudButtonComponent upButton;
   late final HudButtonComponent boosterButton;
+  int difficulty = 1;
   Set<int> keys = {};
   int starsCollected = 0;
   int health;
@@ -211,7 +212,7 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
 void reset(bool start) {
   starsCollected = 0;
   if(!start) {
-    health = 15;
+    health = 5;
     add(Hud(heartImage: 'heart.png',heartHalfImage: 'heart_half.png'));
   }
   initializeGame(false);
@@ -259,7 +260,6 @@ void reset(bool start) {
     super.update(dt);
   }
 }
-
 
 
 

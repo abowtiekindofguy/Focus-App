@@ -28,7 +28,7 @@ class Hud extends PositionComponent with HasGameReference<ChuckJumpGame> {
       textRenderer: TextPaint(
         style: const TextStyle(
           fontSize: 32,
-          color: Color.fromRGBO(10, 10, 10, 1),
+          color: Color.fromRGBO(128, 86, 1, 1),
         ),
       ),
       anchor: Anchor.center,
