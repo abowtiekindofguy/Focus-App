@@ -63,6 +63,7 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
       'notif.png',
       'shield.png',
       'sun.png',
+      'app.png',
     ]);
     
     camera.viewfinder.anchor = Anchor.topLeft;

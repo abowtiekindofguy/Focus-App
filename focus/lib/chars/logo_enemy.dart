@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
@@ -9,6 +11,8 @@ import 'notif.dart';
 
 class LogoEnemy extends SpriteAnimationComponent
     with HasGameReference<ChuckJumpGame> {
+  List<Vector2> img_sizes = [Vector2.all(256), Vector2.all(360), Vector2(728, 559)];
+  List<String> img_names = ['instagram_icon.png', 'whatsapp_icon.png', 'youtube_icon.png'];
   final Vector2 gridPosition;
   double xOffset;
   bool shoot_power = false;
@@ -21,11 +25,12 @@ class LogoEnemy extends SpriteAnimationComponent
 
   @override
   void onLoad() {
+    // int randomIndex = Random().nextInt(3);  
     animation = SpriteAnimation.fromFrameData(
-      game.images.fromCache('instagram_icon.png'),
+      game.images.fromCache('app.png'),
       SpriteAnimationData.sequenced(
         amount: 1,
-        textureSize: Vector2.all(256),
+        textureSize:Vector2.all(500),
         stepTime: 0.70,
       ),
     );
@@ -68,10 +73,10 @@ class ShooterEnemy extends LogoEnemy{
   @override
   Future<void> onLoad() async {
     animation = SpriteAnimation.fromFrameData(
-      game.images.fromCache('instagram_icon.png'),
+      game.images.fromCache('app.png'),
       SpriteAnimationData.sequenced(
         amount: 1,
-        textureSize: Vector2.all(256),
+        textureSize: Vector2.all(500),
         stepTime: 0.70,
       ),
     );
