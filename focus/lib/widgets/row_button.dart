@@ -27,12 +27,13 @@ class InfoRow extends StatelessWidget {
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
+                color: Colors.white,
               ),
             ),
           ),
           Text(
             key,
-            style: Theme.of(context).textTheme.caption,
+            style: const TextStyle(color: Color.fromARGB(255, 71, 71, 71)),
           )
         ],
       );

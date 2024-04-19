@@ -26,21 +26,21 @@ class MainMenu extends StatelessWidget {
               children: [
                 Column(
                   children: [
-                    const Text('Level', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
-                    const Text('Score to achieve', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
-                    const Text('Health', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
-                    const Text('Logo Fire Speed', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
-                    const Text('Gravity', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
+                    const Text('Level', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 115, 62, 4)),),
+                    const Text('Score to achieve', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 115, 62, 4))),
+                    const Text('Health', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 115, 62, 4))),
+                    const Text('Logo Fire Speed', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 115, 62, 4))),
+                    const Text('Gravity', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 115, 62, 4))),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-              Text(': ${game.lvl}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
-              Text(': ${game.score_to_achieve}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
-              Text(': ${game.health}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
-              Text(': ${game.fire_speed}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
-              Text(': ${game.gravity}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
+              Text(': ${game.lvl}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 115, 62, 4))),
+              Text(': ${game.score_to_achieve}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 115, 62, 4))),
+              Text(': ${game.health}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 115, 62, 4))),
+              Text(': ${game.fire_speed}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 115, 62, 4))),
+              Text(': ${game.gravity}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 115, 62, 4))),
             ],),
               ],
             ),

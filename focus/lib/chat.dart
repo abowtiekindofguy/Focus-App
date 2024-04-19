@@ -245,7 +245,11 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // backgroundColor: Color.fromARGB(255, 18, 18, 18),
       appBar: AppBar(
+                foregroundColor: Colors.white,
+
+        backgroundColor: Color.fromARGB(255, 18, 18, 18),
         title: const Text('Focus Bot'),
         actions: [
           IconButton(
@@ -255,6 +259,7 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(onPressed: () => exportPDF(_messagesList,"chat_with_focus_bot.pdf"), icon: const Icon(Icons.download))
         ],
       ),
+      
       body: _isLoading
             ? Center(
               child: Column(
@@ -274,6 +279,7 @@ class _ChatPageState extends State<ChatPage> {
               onSendPressed: _handleSendPressed,
               user: _user,
               theme: const DefaultChatTheme(
+                backgroundColor: Color.fromARGB(255, 18, 18, 18),
                 seenIcon: Text(
                   'read',
                   style: TextStyle(

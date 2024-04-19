@@ -37,6 +37,8 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
   int score_to_achieve;
   int lvl;
   LevelsPage lvls;
+  String cur_date = DateTime.now().day.toString()+"/"+DateTime.now().month.toString()+"/"+DateTime.now().year.toString();
+  bool played = false;
   ChuckJumpGame({required this.health, required this.fire_speed, required this.gravity, required this.score_to_achieve, required this.lvl, required this.lvls});
   @override
   Future<void> onLoad() async {
@@ -263,6 +265,8 @@ void reset(bool start) {
 
   @override
   void update(double dt) {
+    cur_date = DateTime.now().day.toString()+"/"+DateTime.now().month.toString()+"/"+DateTime.now().year.toString();
+
     if (health <= 0 || starsCollected == score_to_achieve) {
       if(starsCollected == score_to_achieve){ 
         lvls.locked[(lvl)%40] = false;
@@ -270,6 +274,18 @@ void reset(bool start) {
           prefs.setStringList('locked', lvls.locked.map((e) => e.toString()).toList());
         });
       }
+      SharedPreferences.getInstance().then((prefs) {
+          int? game_tries = prefs.getInt(cur_date);
+          // if(game_tries == null) print("yes");
+          // else print(cur_date);
+
+          if(!played){
+            prefs.setInt(cur_date, (game_tries!=null)? (++game_tries) : 1);
+            played = true;
+            print(game_tries);
+
+          }
+        });
       overlays.add('GameOver');
     }
     super.update(dt);

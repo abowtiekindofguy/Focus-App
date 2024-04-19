@@ -1,13 +1,41 @@
 import 'package:flutter/material.dart';
 // import 'p/chuck_jump.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:intl/intl.dart';
 import '../chuck_jump.dart';
 
+void setPref(String str, int n) async{
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setInt(str, n);
+}
+int getPref(String str) {
+  int n = 0;
+  SharedPreferences.getInstance().then((prefs) {
+    n = prefs.getInt(str) ?? 1;
+  });
+  return n;
+}
 class GameOver extends StatelessWidget {
   // Reference to parent game.
   final ChuckJumpGame game;
-  const GameOver({super.key, required this.game});
+  int game_tries = 0;
+  String date_string = DateTime.now().day.toString()+"/"+DateTime.now().month.toString()+"/"+DateTime.now().year.toString();
+  GameOver({super.key, required this.game});
+  // int game_tries = 0;
+  bool can_play = false;
 
+  @override
+  void update(double dt) {
+    date_string = DateTime.now().day.toString()+"/"+DateTime.now().month.toString()+"/"+DateTime.now().year.toString();
+    // getTries();
+    // can_play = (game_tries < 5);
+  }
+
+  void getTries() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();  
+    String cur_date = DateTime.now().day.toString()+"/"+DateTime.now().month.toString()+"/"+DateTime.now().year.toString();
+    game_tries = prefs.getInt(cur_date) ?? 1;
+  }
   @override
   Widget build(BuildContext context) {
     const blackTextColor = Color.fromRGBO(0, 0, 0, 1.0);
@@ -57,8 +85,13 @@ class GameOver extends StatelessWidget {
                   onPressed: () {
                     game.startGame = false;
                     game.reset(false);
+                    game.played = false;
                     game.overlays.remove('GameOver');
-                    game.overlays.add('MainMenu');
+                    getTries();
+                    can_play = (game_tries < 20);
+                    print(can_play);
+                    if(can_play) game.overlays.add('MainMenu');
+                    else game.overlays.add('Exhausted');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: whiteTextColor,

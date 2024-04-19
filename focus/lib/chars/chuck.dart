@@ -10,6 +10,7 @@ import '../chars/logo_enemy.dart';
 import '../chuck_jump.dart';
 import 'notif.dart';
 import 'shield.dart';
+import '../play_sound.dart';
 
 class ChuckPlayer extends SpriteAnimationComponent
     with CollisionCallbacks ,HasGameReference<ChuckJumpGame>  {
@@ -142,12 +143,16 @@ void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     }
 
     if (other is LogoEnemy || other is ShooterEnemy) {
+      vibrateHard();
       hit();
     }
 
     if(other is Notif){
       other.removeFromParent();
-      if(!shielded) hit();
+      if(!shielded) {
+        hit();
+        vibrateMedium();
+      } 
     }
 
   super.onCollision(intersectionPoints, other);

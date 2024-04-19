@@ -228,16 +228,16 @@ Widget _buildCard({
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            offset: Offset(4, 4),
-            blurRadius: 8,
-            spreadRadius: 2,
+            color: Colors.black.withOpacity(0.9),
+            offset: Offset(2, 2),
+            blurRadius: 2,
+            spreadRadius: 1,
           ),
           BoxShadow(
-            color: Colors.white.withOpacity(0.7),
-            offset: Offset(-4, -4),
-            blurRadius: 8,
-            spreadRadius: 2,
+            color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.9),
+            offset: Offset(2, 2),
+            blurRadius: 2,
+            spreadRadius: 1,
           ),
         ],
       ),
@@ -365,10 +365,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Color.fromRGBO(18, 18, 18, 255),
+      
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        title: Text('Hi, Let\'s  Focus!'),
+        foregroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 30, 30, 30),
+        title: Text('Hi, Let\'s  Focus!', style: TextStyle(color: Colors.white)),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
@@ -435,43 +437,43 @@ class _HomeScreenState extends State<HomeScreen> {
                 childAspectRatio: 1.0,
                 children: <Widget>[
                   _buildCard(
-                    color: Color.fromARGB(255, 255, 105, 97),       
+                    color: Color.fromARGB(255, 30, 30, 30),       
                     icon: Icons.track_changes,
                     label: 'Track Usage',
                     route: '/track',
                     context: context
                   ),
                   _buildCard(
-                    color: Color.fromARGB(255, 255, 105, 97),
+                    color: Color.fromARGB(255, 30, 30, 30),
                     icon: Icons.facebook,
                     label: 'Friends',
                     route: '/friends',
                     context: context
                   ),
                   _buildCard(
-                    color: Color.fromARGB(255, 255, 105, 97),
+                    color: Color.fromARGB(255, 30, 30, 30),
                     icon: Icons.gamepad,
                     label: 'Game',
                     route: '/game',
                     context: context
                   ),
                   _buildCard(
-                    color: Color.fromARGB(255, 255, 105, 97),
+                    color: Color.fromARGB(255, 30, 30, 30),
                     icon: Icons.alarm,
                     label: 'Challenges',
                     route: '/challenges',
                     context: context
                   ),
                   _buildCard(
-                    color: Color.fromARGB(255, 255, 105, 97),
+                    color: Color.fromARGB(255, 30, 30, 30),
                     icon: Icons.chat_bubble,
                     label: 'Focus Bot',
                     route: '/chat',
                     context: context
                   ),
                   _buildCard(
-                    color: Color.fromARGB(255, 255, 105, 97),
-                    icon: Icons.games,
+                    color: Color.fromARGB(255, 30, 30, 30),
+                    icon: Icons.air,
                     label: 'Breathe',
                     route: '/breathe',
                     context: context

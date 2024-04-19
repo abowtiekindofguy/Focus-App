@@ -3,6 +3,7 @@ import 'package:flame/game.dart';
 import 'overlays/main_menu.dart';
 import 'overlays/game_over.dart';
 import 'overlays/instructions.dart';
+import 'overlays/exhausted.dart';
 import 'chuck_jump.dart'; 
 import 'package:flutter/services.dart';// Make sure this is the correct path to your game logic
 import 'levels.dart';
@@ -46,6 +47,7 @@ class _GameScreenState extends State<GameScreen> {
             'MainMenu': (_, game) => MainMenu(game: game),
             'GameOver': (_, game) => GameOver(game: game),
             'Instructions': (_, game) => Instructions(game: game),
+            'Exhausted':(_, game) => Exhausted(game:game),
           },
           initialActiveOverlays: const ['Instructions'],
         ),
