@@ -20,6 +20,7 @@ class Hud extends PositionComponent with HasGameReference<ChuckJumpGame> {
   });
   
   late TextComponent _scoreTextComponent;
+  late TextComponent _scoreTargetComponent;
 
   @override
   Future<void> onLoad() async {
@@ -35,6 +36,19 @@ class Hud extends PositionComponent with HasGameReference<ChuckJumpGame> {
       position: Vector2(game.size.x - 60, 20),
     );
     add(_scoreTextComponent);
+    
+    _scoreTargetComponent = TextComponent(
+      text: 'Target:${game.score_to_achieve}',
+      textRenderer: TextPaint(
+        style: const TextStyle(
+          fontSize: 20,
+          color: Color.fromRGBO(128, 86, 1, 1),
+        ),
+      ),
+      anchor: Anchor.center,
+      position: Vector2(game.size.x - 168, 22),
+    );
+    add(_scoreTargetComponent);
 
     final starSprite = await game.loadSprite('star.png');
     add(

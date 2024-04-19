@@ -21,6 +21,29 @@ class MainMenu extends StatelessWidget {
         Container(
             width: 400,
             height: 200,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  children: [
+                    const Text('Level', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
+                    const Text('Score to achieve', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
+                    const Text('Health', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
+                    const Text('Logo Fire Speed', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
+                    const Text('Gravity', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+              Text(': ${game.lvl}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
+              Text(': ${game.score_to_achieve}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
+              Text(': ${game.health}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
+              Text(': ${game.fire_speed}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
+              Text(': ${game.gravity}', style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold)),
+            ],),
+              ],
+            ),
             // child: 
             
                 // Column(

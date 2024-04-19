@@ -50,7 +50,7 @@ class LogoEnemy extends SpriteAnimationComponent
   void update(double dt) {
     velocity.x = game.objectSpeed;
     position += velocity * dt;
-    if (position.x < -size.x|| game.health<=0) removeFromParent();
+    if (position.x < -size.x|| game.health<=0 || game.starsCollected == game.score_to_achieve) removeFromParent();
     super.update(dt);
   }
 }
@@ -114,7 +114,7 @@ class ShooterEnemy extends LogoEnemy{
       shoot_power= true;
       super.game.add(_bulletSpawner);
     }
-    if (position.x < -size.x|| game.health<=0) {
+    if (position.x < -size.x|| game.health<=0 || game.starsCollected == game.score_to_achieve) {
       removeFromParent();
       _bulletSpawner.removeFromParent();
     }

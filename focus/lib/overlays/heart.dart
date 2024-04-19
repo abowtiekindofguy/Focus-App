@@ -52,7 +52,7 @@ class HeartHealthComponent extends SpriteGroupComponent<HeartState>
     } else {
       current = HeartState.available;
     }
-    if(game.health == 0){
+    if(game.health == 0 || game.starsCollected == game.score_to_achieve){
       removeFromParent();
     }
     super.update(dt);

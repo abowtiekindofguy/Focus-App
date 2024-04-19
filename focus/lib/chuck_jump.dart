@@ -265,7 +265,7 @@ void reset(bool start) {
   void update(double dt) {
     if (health <= 0 || starsCollected == score_to_achieve) {
       if(starsCollected == score_to_achieve){ 
-        lvls.locked[(lvl+1)%40] = false;
+        lvls.locked[(lvl)%40] = false;
         SharedPreferences.getInstance().then((prefs) {
           prefs.setStringList('locked', lvls.locked.map((e) => e.toString()).toList());
         });

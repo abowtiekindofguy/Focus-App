@@ -1,27 +1,36 @@
+import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:focus/main_chuck.dart';// Make sure this is the correct path to your game logic
 import 'package:shared_preferences/shared_preferences.dart';
+
+Future<List<String>?> getList() async{
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? savedList = prefs.getStringList('locked');
+    return savedList;
+    // if (savedList != null) {
+    //   widget.locked = savedList.map((e) => e == 'true').toList();
+    // }
+}
+
 class LevelsPage extends StatefulWidget {
-  List<bool> locked = List.generate(40, (index) => (index == 0) ? false : true); // Default values
+  List<bool> locked = (List.generate(40, (index) => (index == 0) ? false : true)); // Default values
   // TODO: Extract list from shared preferences if present
   // Example code to extract from shared preferences:
   
   @override
   _LevelsPageState createState() => _LevelsPageState();
 }
+
 class _LevelsPageState extends State<LevelsPage> {
   double fire_speed = 1.5;
   int score_to_achieve= 20;
   double gravity = 15;
   int init_health = 10;
   @override
-  void initState() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? savedList = prefs.getStringList('locked');
-    if (savedList != null) {
-      widget.locked = savedList.map((e) => e == 'true').toList();
-    }
+  void initState()  {
+    // resetList();
+    setList();
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
@@ -29,6 +38,21 @@ class _LevelsPageState extends State<LevelsPage> {
     ]);
   }
 
+  void setList() async {
+    List<String>? savedList = await getList();
+    if (savedList != null) {
+      setState(() {
+        widget.locked = savedList.map((e) => e == 'true').toList();
+      });
+    }
+  }  
+  void resetList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('locked');
+    setState(() {
+      widget.locked = List.generate(40, (index) => (index == 0) ? false : true);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +66,7 @@ class _LevelsPageState extends State<LevelsPage> {
                 child: ElevatedButton(
                   onPressed: () {
                     fire_speed = 3 - (index~/10)*0.5;
-                    score_to_achieve = 20 + (1+index%10)*2;
+                    score_to_achieve = 15 + (1+index%10)*2;
                     gravity = 15;
                     if(!widget.locked[index]){
                     Navigator.push(
@@ -66,7 +90,7 @@ class _LevelsPageState extends State<LevelsPage> {
                     ),
                     minimumSize: Size(100, 70), // Increase the button width to 120
                   ),
-                  child: (widget.locked[index])?Icon(Icons.lock) :Text('Level ${index + 1}'),
+                  child: (widget.locked[index])? Icon(Icons.lock) :Text('Level ${index + 1}'),
                 ),
             
           

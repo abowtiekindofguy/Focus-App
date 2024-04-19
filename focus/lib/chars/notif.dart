@@ -36,7 +36,7 @@ class Notif extends SpriteAnimationComponent
     if(game.objectSpeed != 0){
       position.x += dt * game.objectSpeed;
     }
-    if (position.y < -height || position.x <0|| game.health<=0) {
+    if (position.y < -height || position.x <0|| game.health<=0 || game.starsCollected == game.score_to_achieve) {
       removeFromParent();
     }
 

@@ -29,7 +29,7 @@ class Shield extends SpriteComponent
     // position.x += dt * game.chuck.velocity.x;
     // position.y += dt * game.chuck.velocity.y;
 
-    if (position.x <0|| game.health<=0) {
+    if (position.x <0|| game.health<=0 || game.starsCollected == game.score_to_achieve) {
       removeFromParent();
     }
 

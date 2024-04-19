@@ -48,7 +48,7 @@ class GroundBlock extends SpriteComponent with HasGameReference<ChuckJumpGame> {
         );
       }
     }
-    if (game.health <= 0) {
+    if (game.health <= 0 || game.starsCollected == game.score_to_achieve) {
       removeFromParent();
     }
     if (gridPosition.x == 9) {

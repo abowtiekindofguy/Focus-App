@@ -18,9 +18,7 @@ final segments = [
   segment3,
   segment4,
   segment6,
-  segment7,
   segment5,
-  segment6,
   segment7,
 ];
 

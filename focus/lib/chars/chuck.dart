@@ -102,7 +102,7 @@ class ChuckPlayer extends SpriteAnimationComponent
     game.health = 0;
   }
 
-  if (game.health <= 0) {
+  if (game.health <= 0 || game.starsCollected == game.score_to_achieve) {
     horizontalDirection = 0;
     game.objectSpeed = 0;
     removeFromParent();
