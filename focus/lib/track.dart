@@ -21,6 +21,8 @@ import 'package:open_file/open_file.dart';
 import 'package:installed_apps/installed_apps.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'appicon.dart';
+import 'dart:math';
+
 
 Future<Map<String,int>> getDayAppUsageInMinutes() async {
   DateTime endTime = DateTime.now();
@@ -304,7 +306,7 @@ class _TrackPageState extends State<TrackPage> {
             ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              itemCount: 10, // the number of items in your list
+              itemCount: min(10,info.length), // the number of items in your list
               itemBuilder: (context, index) {
                 return AppTile(packageName: info[index].packageName, text: info[index].usage.inMinutes.toString() + ' minutes');
               },

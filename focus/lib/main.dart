@@ -417,7 +417,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return InfoRow(info: {
                     'Day Usage': snapshot.data?[0]?.toString() ?? '-',
                     'Month Usage': snapshot.data?[1]?.toString() ?? '-',
-                    'Challenge Score': (snapshot.data?[2] as double?)?.toStringAsFixed(2) ?? '-',
+                    'Focus Score': (snapshot.data?[2] as double?)?.toStringAsFixed(2) ?? '-',
                   });
                 }
               },
