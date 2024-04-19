@@ -25,12 +25,12 @@ class LogoEnemy extends SpriteAnimationComponent
 
   @override
   void onLoad() {
-    // int randomIndex = Random().nextInt(3);  
+    int randomIndex = Random().nextInt(3);  
     animation = SpriteAnimation.fromFrameData(
-      game.images.fromCache('app.png'),
+      game.images.fromCache(img_names[randomIndex]),
       SpriteAnimationData.sequenced(
         amount: 1,
-        textureSize:Vector2.all(500),
+        textureSize:img_sizes[randomIndex],
         stepTime: 0.70,
       ),
     );
@@ -72,11 +72,12 @@ class ShooterEnemy extends LogoEnemy{
 
   @override
   Future<void> onLoad() async {
+    int randomIndex = Random().nextInt(3);  
     animation = SpriteAnimation.fromFrameData(
-      game.images.fromCache('app.png'),
+      game.images.fromCache(img_names[randomIndex]),
       SpriteAnimationData.sequenced(
         amount: 1,
-        textureSize: Vector2.all(500),
+        textureSize: img_sizes[randomIndex],
         stepTime: 0.70,
       ),
     );
