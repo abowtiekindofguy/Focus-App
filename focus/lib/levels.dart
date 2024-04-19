@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';// Make sure this is the correct path to your game logic
+import 'package:flutter/services.dart';
+import 'package:focus/main_chuck.dart';// Make sure this is the correct path to your game logic
 
 class LevelsPage extends StatefulWidget {
   @override
@@ -8,6 +9,8 @@ class LevelsPage extends StatefulWidget {
 class _LevelsPageState extends State<LevelsPage> {
   double fire_speed = 1.5;
   int score_to_achive= 20;
+  double gravity = 15;
+  int init_health = 10;
   @override
   void initState() {
     super.initState();
@@ -22,6 +25,7 @@ class _LevelsPageState extends State<LevelsPage> {
     return Scaffold(
       body: GridView.count(
         crossAxisCount: 4,
+        scrollDirection: Axis.horizontal,
         children: List.generate(40, (index) {
           return Padding(
             padding: EdgeInsets.all(4.0), // Add padding between buttons
@@ -30,6 +34,18 @@ class _LevelsPageState extends State<LevelsPage> {
                   onPressed: () {
                     fire_speed = 1.5 + (index~/10)*0.5;
                     score_to_achive = 20 + (1+index%10)*2;
+                    gravity = 15;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                      builder: (context) => GameScreen(
+                        init_health: init_health,
+                        gravity: gravity,
+                        score_to_achieve: score_to_achive,
+                        fire_speed: fire_speed,
+                      ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     shape : RoundedRectangleBorder(
@@ -42,8 +58,7 @@ class _LevelsPageState extends State<LevelsPage> {
             
           
           );
-        }),
-        scrollDirection: Axis.horizontal, // Make the buttons scrollable in the cross axis
+        }), // Make the buttons scrollable in the cross axis
       ),
     );
   }

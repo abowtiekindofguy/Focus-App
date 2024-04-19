@@ -8,16 +8,9 @@ import 'package:flutter/services.dart';// Make sure this is the correct path to 
 
 
 class GameScreen extends StatefulWidget {
-  final init_health;
-  GameScreen({this.init_health = 5});
+  final init_health, fire_speed, gravity, score_to_achieve;
+  GameScreen({this.init_health = 5, this.fire_speed = 1.5, this.gravity = 15, this.score_to_achieve = 20});
 
-  // @override
-  // void initState() {
-  //   SystemChrome.setPreferredOrientations([
-  //     DeviceOrientation.portraitDown,
-  //     DeviceOrientation.portraitUp,
-  //   ]);
-  // }
   @override
   _GameScreenState createState() => _GameScreenState();
 }
@@ -36,8 +29,6 @@ class _GameScreenState extends State<GameScreen> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
-      // DeviceOrientation.landscapeLeft,
-      // DeviceOrientation.landscapeRight,
     ]);
     super.dispose();
   }
@@ -49,7 +40,7 @@ class _GameScreenState extends State<GameScreen> {
         constraints: BoxConstraints.expand(),
         child: GameWidget<ChuckJumpGame>.controlled(
           
-          gameFactory: () => ChuckJumpGame(health: widget.init_health),
+          gameFactory: () => ChuckJumpGame(health: widget.init_health, fire_speed: widget.fire_speed, gravity:widget.gravity, score_to_achieve: widget.score_to_achieve),
           overlayBuilderMap: {
             'MainMenu': (_, game) => MainMenu(game: game),
             'GameOver': (_, game) => GameOver(game: game),

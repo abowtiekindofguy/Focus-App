@@ -18,7 +18,7 @@ class ChuckPlayer extends SpriteAnimationComponent
   final double moveSpeed = 200;
   final Vector2 fromAbove = Vector2(0, -1);
   bool isOnGround = false;
-  final double gravity = 15;
+  final double gravity;
   final double jumpSpeed = 500;
   final double terminalVelocity = 75;
   bool hitByEnemy = false;
@@ -26,7 +26,7 @@ class ChuckPlayer extends SpriteAnimationComponent
   bool shielded = false;
   late final Shield _shield;
   ChuckPlayer({
-    required super.position,
+    required super.position, this.gravity = 15,
   }) : super(size: Vector2.all(32), anchor: Anchor.center);
 
   @override

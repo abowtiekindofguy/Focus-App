@@ -30,9 +30,10 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
   int health;
   int theme = 0;
   bool startGame = false;
-  double fire_speed = 1.5;
-  int score_to_achieve = 20;
-  ChuckJumpGame({required this.health});
+  double fire_speed;
+  double gravity;
+  int score_to_achieve;
+  ChuckJumpGame({required this.health, required this.fire_speed, required this.gravity, required this.score_to_achieve});
   @override
   Future<void> onLoad() async {
     await images.loadAll([
@@ -203,6 +204,7 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
   if(startGame){
   chuck = ChuckPlayer(
     position: Vector2(128, canvasSize.y - 128),
+    gravity: gravity
   );
   
   add(chuck);
