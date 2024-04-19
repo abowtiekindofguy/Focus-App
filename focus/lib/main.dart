@@ -90,8 +90,10 @@ void callbackDispatcher() {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  String email = await Authentication.getEmail();
-  String name = await Authentication.getName();
+  // String email = await Authentication.getEmail();
+  // String name = await Authentication.getName();
+  String email = "akshat@gmail.com";
+  String name = "Akshat";
   OpenAI.apiKey = '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';
   Workmanager().initialize(
     callbackDispatcher, // The top-level function, aka callbackDispatcher
@@ -107,7 +109,7 @@ Future<void> main() async {
   );
   runApp(
     MaterialApp(
-      initialRoute: '/',
+      initialRoute: '/home',
       routes: {
         '/': (context) => LoginScreen(),
         '/home': (context) => HomeScreen(currentUserId: email, name: name,),
@@ -480,6 +482,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.air,
                     label: 'Breathe',
                     route: '/breathe',
+                    context: context
+                  ),
+                  _buildCard(
+                    color: Color.fromARGB(255, 30, 30, 30),
+                    icon: Icons.numbers,
+                    label: 'Sudoku',
+                    route: '/sudoku',
                     context: context
                   ),
                 ],

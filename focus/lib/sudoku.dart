@@ -316,6 +316,7 @@ class _SudokuPageState extends State<SudokuPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255,18,18,18),
       appBar: AppBar(
         title: const Text('Sudoku Game'),
       ),
@@ -327,6 +328,7 @@ class _SudokuPageState extends State<SudokuPage> {
               '${(_seconds ~/ 60).toString().padLeft(2, '0')}:${(_seconds % 60).toString().padLeft(2, '0')}',
               style: TextStyle(
                 fontSize: 20,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 16),
