@@ -451,11 +451,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   _buildCard(
                     color: Color.fromARGB(255, 30, 30, 30),
-                    icon: Icons.facebook,
-                    label: 'Friends',
-                    route: '/friends',
+                    icon: Icons.alarm,
+                    label: 'Challenges',
+                    route: '/challenges',
                     context: context
                   ),
+                  
                   _buildCard(
                     color: Color.fromARGB(255, 30, 30, 30),
                     icon: Icons.gamepad,
@@ -463,13 +464,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     route: '/game',
                     context: context
                   ),
-                  _buildCard(
-                    color: Color.fromARGB(255, 30, 30, 30),
-                    icon: Icons.alarm,
-                    label: 'Challenges',
-                    route: '/challenges',
-                    context: context
-                  ),
+                  
                   _buildCard(
                     color: Color.fromARGB(255, 30, 30, 30),
                     icon: Icons.chat_bubble,
@@ -489,6 +484,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.numbers,
                     label: 'Sudoku',
                     route: '/sudoku',
+                    context: context
+                  ),
+                  _buildCard(
+                    color: Color.fromARGB(255, 30, 30, 30),
+                    icon: Icons.facebook,
+                    label: 'Friends',
+                    route: '/friends',
                     context: context
                   ),
                   _buildCard(
