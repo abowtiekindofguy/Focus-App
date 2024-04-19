@@ -13,6 +13,8 @@ import 'chuck_environment/star.dart';
 import 'overlays/hud.dart';
 import 'managers/segments.dart';
 import 'package:flutter/material.dart';
+import 'levels.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChuckJumpGame extends FlameGame with HasCollisionDetection{
   late ChuckPlayer chuck;
@@ -33,7 +35,9 @@ class ChuckJumpGame extends FlameGame with HasCollisionDetection{
   double fire_speed;
   double gravity;
   int score_to_achieve;
-  ChuckJumpGame({required this.health, required this.fire_speed, required this.gravity, required this.score_to_achieve});
+  int lvl;
+  LevelsPage lvls;
+  ChuckJumpGame({required this.health, required this.fire_speed, required this.gravity, required this.score_to_achieve, required this.lvl, required this.lvls});
   @override
   Future<void> onLoad() async {
     await images.loadAll([
@@ -260,6 +264,12 @@ void reset(bool start) {
   @override
   void update(double dt) {
     if (health <= 0 || starsCollected == score_to_achieve) {
+      if(starsCollected == score_to_achieve){ 
+        lvls.locked[(lvl+1)%40] = false;
+        SharedPreferences.getInstance().then((prefs) {
+          prefs.setStringList('locked', lvls.locked.map((e) => e.toString()).toList());
+        });
+      }
       overlays.add('GameOver');
     }
     super.update(dt);

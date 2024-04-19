@@ -43,7 +43,7 @@ import 'chat.dart';
 import 'breathe_game.dart';
 import 'package:vibration/vibration.dart';
 import 'levels.dart';
-import 'widgets/row_button.dart ';
+import 'widgets/row_button.dart';
 
 const checkAppUsage = "checkAppUsage";
 const fetchParentalControl = "fetchParentalControl";
