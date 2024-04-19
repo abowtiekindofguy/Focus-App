@@ -237,6 +237,8 @@ class IssueChallenge extends StatelessWidget {
                 return FutureBuilder<double>(
                   future: getChallengeScore(),
                   builder: (context, snapshot) {
+                    print(numActive);
+                    print(getAllChallenges());
                     if (snapshot.connectionState != ConnectionState.done) {
                       return const CircularProgressIndicator(); // Show loading indicator while data is fetching
                     }

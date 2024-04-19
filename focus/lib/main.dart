@@ -47,35 +47,32 @@ import 'widgets/row_button.dart ';
 
 const checkAppUsage = "checkAppUsage";
 const fetchParentalControl = "fetchParentalControl";
-const fetchBackground = "fetchBackground";
+const checkDistraction = "checkDistraction";
 
 
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     switch (task) {
-      case fetchBackground:
+      case checkDistraction:
         try {
-          // Initialize Notification Plugin
           FlutterLocalNotificationsPlugin flip = FlutterLocalNotificationsPlugin();
           var android = AndroidInitializationSettings('@mipmap/ic_launcher');
           var settings = InitializationSettings(android: android);
           await flip.initialize(settings);
 
-          // Check App Usage
+          List<String> packagesBlock = ['com.whatsapp','com.google.android.youtube', 'com.instagram.android', 'com.twitter.android', 'com.facebook.katana', 'com.snapchat.android', 'com.tinder', 'com.linkedin.android', 'com.pinterest', 'com.reddit.frontpage', 'com.spotify.music' ];
           AppUsage appUsage = AppUsage();
           try {
             DateTime endDate = DateTime.now();
             DateTime startDate = endDate.subtract(Duration(hours: 1)); // check last hour usage
             List<AppUsageInfo> infoList = await appUsage.getAppUsage(startDate, endDate);
-            bool isYouTubeActive = infoList.any((info) => info.packageName.contains('com.google.android.youtube') && info.usage.inMinutes > 1);
-            
-            if (isYouTubeActive) {
-              // Send Notification if YouTube was active in the last hour
+            bool isDistractionActive = infoList.any((info) => packagesBlock.any((package) => info.packageName.contains(package)) && info.usage.inMinutes > 1);
+            if (isDistractionActive) {
               var androidDetails = const AndroidNotificationDetails(
-                'channel_id', 'YouTube Notification',
+                'channel_id', 'Distraction Notification',
                 importance: Importance.max, priority: Priority.high, ticker: 'ticker');
               var platformDetails = NotificationDetails(android: androidDetails);
-              await flip.show(0, 'YouTube Checker', 'YouTube is active in the last hour!', platformDetails);
+              await flip.show(0, 'Distraction Checker', 'A distracting app is active in the last hour! Be sure to take regular breaks from work and avoid using these apps as much as possible. \n You can do it!', platformDetails);
             }
           } catch (e) {
             print("Error fetching app usage: $e");
@@ -101,8 +98,8 @@ Future<void> main() async {
   );
   Workmanager().registerPeriodicTask(
     "1",
-    fetchBackground,
-    frequency: Duration(seconds: 15), // defines the frequency in which your task should be called
+    checkDistraction,
+    frequency: Duration(minutes: 15), // defines the frequency in which your task should be called
     constraints: Constraints(
       networkType: NetworkType.connected,
     ),
@@ -114,7 +111,7 @@ Future<void> main() async {
         '/': (context) => LoginScreen(),
         '/home': (context) => HomeScreen(),
         '/register': (context) => RegisterPage(),
-        '/track': (context) => TrackPage(),
+        '/track': (context) => TrackPage(currentUserId: email,),
         '/friends': (context) => FriendsPage(currentUserId: email),
         '/friendrequests': (context) =>
             FriendRequestsPage(currentUserId: email),
@@ -367,9 +364,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Future<void> _signOut() async {
-    //   await FirebaseAuth.instance.signOut();
-    // }
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
@@ -428,10 +422,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 return Text('Error: ${snapshot.error}');
               } else {
                 return InfoRow(info: {
-                  'Challenge Score': snapshot.data![0].toStringAsFixed(2) ?? '-',
+                  'Challenge Score': snapshot.data![0].toStringAsFixed(2),
                 });
               }
             }),
+            
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,

@@ -65,14 +65,14 @@ class ProfileCard extends StatelessWidget {
         return ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.lightBlueAccent,
+           backgroundColor: Colors.white,
             foregroundColor: Colors.black,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
+            // shape: RoundedRectangleBorder(
+            //   borderRadius: BorderRadius.circular(15.0),
+            // ),
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             textStyle: TextStyle(fontSize: 16),
-            fixedSize: Size(width, height),
+            // fixedSize: Size(width, height),
           ),
           child: Row(
             children: [

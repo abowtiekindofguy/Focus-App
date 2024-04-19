@@ -53,7 +53,7 @@ class _LevelsPageState extends State<LevelsPage> {
                     ),
                     minimumSize: Size(100, 70), // Increase the button width to 120
                   ),
-                  child: Text('Lvl ${index + 1}'),
+                  child: Text('Level ${index + 1}'),
                 ),
             
           

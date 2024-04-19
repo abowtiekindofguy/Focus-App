@@ -1,3 +1,5 @@
+import 'package:focus/firebase_map.dart';
+
 import 'main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,7 +40,7 @@ Future<String> getDayAppUsageInMinutesString() async {
   List<AppUsageInfo> infoList = await AppUsage().getAppUsage(startTime, endTime);
  int appUsageMinutes = 0;
   for (AppUsageInfo appUsageInfo in infoList) {
-    appUsageMinutes+=appUsageInfo.usage.inMinutes;
+    if (appUsageInfo.packageName!='com.example.focus') {appUsageMinutes+=appUsageInfo.usage.inMinutes;}
   }
 
   int min = appUsageMinutes;
@@ -51,7 +53,7 @@ Future<String> getWeekAppUsageInMinutesString() async {
   List<AppUsageInfo> infoList = await AppUsage().getAppUsage(startTime, endTime);
   int appUsageMinutes = 0;
   for (AppUsageInfo appUsageInfo in infoList) {
-    appUsageMinutes+=appUsageInfo.usage.inMinutes;
+    if (appUsageInfo.packageName!='com.example.focus') {appUsageMinutes+=appUsageInfo.usage.inMinutes;}
   }
 
   int min = appUsageMinutes;
@@ -64,11 +66,15 @@ Future<String> getMonthAppUsageInMinutesString() async {
   List<AppUsageInfo> infoList = await AppUsage().getAppUsage(startTime, endTime);
   int appUsageMinutes = 0;
   for (AppUsageInfo appUsageInfo in infoList) {
-    appUsageMinutes+=appUsageInfo.usage.inMinutes;
+    if (appUsageInfo.packageName!='com.example.focus') {appUsageMinutes+=appUsageInfo.usage.inMinutes;}
   }
 
   int min = appUsageMinutes;
-  return (min~/60).toString() + " hr " + (min%60).toString() + " min";
+  int hrs = min ~/60;
+  int days = min ~/(60*24);
+  hrs = hrs - 24*days;
+  
+  return days.toString() + " days " + (hrs).toString() + " hr";
 }
 
 
@@ -167,7 +173,8 @@ void createUsagePDF(List<AppUsageInfo> appUsage, String filename, String suggest
 
 
 class TrackPage extends StatefulWidget {
-  const TrackPage({Key? key}) : super(key: key);
+  final String currentUserId;
+  const TrackPage({Key? key, required this.currentUserId}) : super(key: key);
 
   @override
   _TrackPageState createState() => _TrackPageState();
@@ -204,10 +211,8 @@ class _TrackPageState extends State<TrackPage> {
 
   Future<void> initAsync() async {
     await getUsageStats();
-    // Map<int,int> hourlyUsageComputed = await hourlyUsage();
-    // barGroups = getBarGroups(hourlyUsageComputed);
     uploadUsageStats();
-    suggestions = await getResponse("The user has following App Usage times:"+appUsageMinutes.toString()+"Please suggest in detail 10000 words for the user in as many words as possible");
+    suggestions = await getResponse("The user has following App Usage times:"+appUsageMinutes.toString()+" Exclude system apps from your analysis. Please suggest in detail 10000 words for the user in as many words as possible");
     //suggestions = "aapke liye kuch nahi";
     setState(() {});
   }
@@ -218,6 +223,7 @@ class _TrackPageState extends State<TrackPage> {
     List<Map<String, dynamic>> infoListMapped = info.map((appUsageInfo) => appUsageInfoToMap(appUsageInfo)).toList();
     String jsonEncodedData = jsonEncode(infoListMapped);
     FirebaseDatabase().uploadData("usage",metadata, jsonEncodedData);
+    setFirebaseValue(widget.currentUserId, "usageReport", "infoList", jsonEncodedData);
   }
 
   Future<void> getUsageStats() async {
@@ -227,9 +233,10 @@ class _TrackPageState extends State<TrackPage> {
       List<AppUsageInfo> infoList = await AppUsage().getAppUsage(startDate, endDate);
       setState (() {
         infoList.sort((a, b) => b.usage.inMinutes.compareTo(a.usage.inMinutes));
+        infoList.removeWhere((appUsageInfo) => appUsageInfo.packageName == 'com.example.focus');
         info = infoList;
         for (AppUsageInfo appUsageInfo in infoList) {
-          appUsageMinutes[appUsageInfo.packageName] = appUsageInfo.usage.inMinutes;
+    if (appUsageInfo.packageName!='com.example.focus') {appUsageMinutes[appUsageInfo.packageName]=appUsageInfo.usage.inMinutes;}
         }
       });
               
@@ -304,7 +311,7 @@ class _TrackPageState extends State<TrackPage> {
                 Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                "Loading suggestions tailored for you...",
+                "Loading suggestions from the Focus Bot tailored for you...",
               // print(suggestions);,
                 // style: TextStyle(color: Colors.white),
               ),

@@ -234,10 +234,11 @@ Widget build(BuildContext context) {
                 itemCount: friends.length,
                 itemBuilder: (context, index) {
                   String friendUserId = friends[index];
-                  return Padding(
-                  padding: EdgeInsets.symmetric(vertical: 4.0),
-                  child: ProfileCard(userID: friendUserId, height:MediaQuery.of(context).size.height/10, width: 0.4*MediaQuery.of(context).size.width, onPressed: () => Navigator.pushNamed(context, '/profile_page')),
-                  );
+                  return ProfileCard(userID: friendUserId, height:MediaQuery.of(context).size.height/10, width: 0.4*MediaQuery.of(context).size.width, onPressed: () => Navigator.pushNamed(context, '/profile_page'));
+                  // return Padding(
+                  // padding: EdgeInsets.symmetric(vertical: 4.0),
+                  // child: ,
+                  // );
                 },
                 );
             },

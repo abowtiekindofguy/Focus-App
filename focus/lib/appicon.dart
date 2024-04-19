@@ -39,7 +39,7 @@ class AppTile extends StatelessWidget  {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-                   leading: Image.asset(appIcons[packageName] ?? 'assets/images/water_enemy.png'),
+                   leading: Image.asset(appIcons[packageName] ?? 'assets/images/app.png'),
             title: Text(appName[packageName] ?? 'Unknown'),
             subtitle: Text(packageName),
             trailing: Text(text),
