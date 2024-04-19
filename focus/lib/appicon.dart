@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 
 List<String> socialApps = ['com.whatsapp','com.google.android.youtube', 'com.instagram.android', 'com.twitter.android', 'com.facebook.katana', 'com.snapchat.android', 'com.tinder', 'com.linkedin.android', 'com.pinterest', 'com.reddit.frontpage', 'com.spotify.music' ];
+
 Map<String,String> appIcons = {
   'com.whatsapp': 'assets/images/whatsapp_icon.png',
   'com.google.android.youtube': 'assets/images/youtube_icon.png',
@@ -15,6 +16,7 @@ Map<String,String> appIcons = {
   'com.reddit.frontpage': 'assets/images/reddit_icon.png',
   'com.spotify.music': 'assets/images/spotify_icon.png',
 };
+
 Map<String,String> appName = {
   'com.whatsapp': 'WhatsApp',
   'com.google.android.youtube': 'YouTube',
@@ -40,7 +42,7 @@ class AppTile extends StatelessWidget  {
   Widget build(BuildContext context) {
     return ListTile(
                    leading: Image.asset(appIcons[packageName] ?? 'assets/images/app.png'),
-            title: Text(appName[packageName] ?? 'Unknown'),
+            title: Text(appName[packageName] ?? 'Android App'),
             subtitle: Text(packageName),
             trailing: Text(text),
           );

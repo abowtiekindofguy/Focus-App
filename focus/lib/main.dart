@@ -90,7 +90,8 @@ void callbackDispatcher() {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  String email = 'akshat@gmail.com';
+  String email = await Authentication.getEmail();
+  String name = await Authentication.getName();
   OpenAI.apiKey = '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';
   Workmanager().initialize(
     callbackDispatcher, // The top-level function, aka callbackDispatcher
@@ -106,10 +107,10 @@ Future<void> main() async {
   );
   runApp(
     MaterialApp(
-      initialRoute: '/home',
+      initialRoute: '/',
       routes: {
         '/': (context) => LoginScreen(),
-        '/home': (context) => HomeScreen(),
+        '/home': (context) => HomeScreen(currentUserId: email, name: name,),
         '/register': (context) => RegisterPage(),
         '/track': (context) => TrackPage(currentUserId: email,),
         '/friends': (context) => FriendsPage(currentUserId: email),
@@ -119,12 +120,13 @@ Future<void> main() async {
         '/sudoku': (context) => SudokuPage(currentUserId: email),
         '/game': (context) => LevelsPage(),
         // '/inviteFriend': (context) => InviteFriendPage(currentUserId: email),
-        '/challenges': (context) => ChallengePage(currentUserId: email),
+        '/challenges': (context) => AcceptedChallenges(currentUserId: email),
         '/acceptedChallenges': (context) => AcceptedChallenges(currentUserId: email),
         '/issueChallenge': (context) => IssueChallenge(currentUserId: email),
         '/profilePage': (context) => ProfilePage(currentUserId: email),
         '/chat' :(context) => ChatPage(start_message: "babushka"),
         '/breathe': (context) => BreatheGame(),
+
             },
           ),
         );
@@ -331,11 +333,15 @@ class SearchBar extends StatelessWidget {
 //     super.initState();
 //   }
 
+
 class HomeScreen extends StatefulWidget {
+  final currentUserId, name;
+
+  HomeScreen({required this.currentUserId, required this.name});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
-
 
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -370,12 +376,12 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         foregroundColor: Colors.white,
         backgroundColor: Color.fromARGB(255, 30, 30, 30),
-        title: Text('Hi, Let\'s  Focus!', style: TextStyle(color: Colors.white)),
+        title: Text('Let\'s Focus!', style: TextStyle(color: Colors.white)),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {},
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.settings),
+          //   onPressed: () {},
+          // ),
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: () {
@@ -399,35 +405,33 @@ class _HomeScreenState extends State<HomeScreen> {
             FutureBuilder(
               future: Future.wait([
                 getDayAppUsageInMinutesString(),
-                getWeekAppUsageInMinutesString(),
                 getMonthAppUsageInMinutesString(),
+                getChallengeScore(widget.currentUserId)
               ]),
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
+                if (snapshot.connectionState == ConnectionState.waiting) { return CircularProgressIndicator(); }
+                else if (snapshot.hasError) { return Text('Error: ${snapshot.error}'); }
+                else {
                   return InfoRow(info: {
-                    'Day Usage': snapshot.data![0] ?? '-',
-                    'Week Usage': snapshot.data![1] ?? '-',
-                    'Month Usage': snapshot.data![2]  ?? '-',
+                    'Day Usage': snapshot.data?[0]?.toString() ?? '-',
+                    'Month Usage': snapshot.data?[1]?.toString() ?? '-',
+                    'Challenge Score': (snapshot.data?[2] as double?)?.toStringAsFixed(2) ?? '-',
                   });
                 }
               },
             ),
 
-            FutureBuilder(future: Future.wait([getChallengeScore()]), builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                return InfoRow(info: {
-                  'Challenge Score': snapshot.data![0].toStringAsFixed(2),
-                });
-              }
-            }),
+            // FutureBuilder(future: Future.wait([getChallengeScore(widget.currentUserId)]), builder: (context, snapshot) {
+            //   if (snapshot.connectionState == ConnectionState.waiting) {
+            //     return CircularProgressIndicator();
+            //   } else if (snapshot.hasError) {
+            //     return Text('Error: ${snapshot.error}');
+            //   } else {
+            //     return InfoRow(info: {
+            //       'Challenge Score': snapshot.data![0].toStringAsFixed(2),
+            //     });
+            //   }
+            // }),
             
             Expanded(
               child: GridView.count(
@@ -484,65 +488,65 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
 
-SingleChildScrollView(
-  scrollDirection: Axis.horizontal,
-  child: Row(children: [ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/chat'),
-                  child: Text('Chat'),
-                ),
-    ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/register'),
-                  child: Text('Register'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/track'),
-                  child: Text('Track'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/friends'),
-                  child: Text('Friends'),
-                ),
-                ElevatedButton(
-                  onPressed: () =>
-                      Navigator.pushNamed(context, '/friendrequests'),
-                  child: Text('Friend Requests'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/map'),
-                  child: Text('Map'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/sudoku'),
-                  child: Text('Sudoku'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/game'),
-                  child: Text('Chuck Jump'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/inviteFriend'),
-                  child: Text('Invite Friends'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/challenges'),
-                  child: Text('Challenges'),
-                ),
-                ElevatedButton(
-                  onPressed: () =>
-                      Navigator.pushNamed(context, '/acceptedChallenges'),
-                  child: Text('Accepted Challenges'),
-                ),
-                ElevatedButton(
-                  onPressed: () =>
-                      Navigator.pushNamed(context, '/issueChallenge'),
-                  child: Text('Issue Challenge'),
-                ),
-                ElevatedButton(
-                  onPressed: () =>
-                      Navigator.pushNamed(context, '/profilePage'),
-                  child: Text('Profile Page'),
-                ),],),
-),
+// SingleChildScrollView(
+//   scrollDirection: Axis.horizontal,
+//   child: Row(children: [ElevatedButton(
+//                   onPressed: () => Navigator.pushNamed(context, '/chat'),
+//                   child: Text('Chat'),
+//                 ),
+//     ElevatedButton(
+//                   onPressed: () => Navigator.pushNamed(context, '/register'),
+//                   child: Text('Register'),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () => Navigator.pushNamed(context, '/track'),
+//                   child: Text('Track'),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () => Navigator.pushNamed(context, '/friends'),
+//                   child: Text('Friends'),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () =>
+//                       Navigator.pushNamed(context, '/friendrequests'),
+//                   child: Text('Friend Requests'),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () => Navigator.pushNamed(context, '/map'),
+//                   child: Text('Map'),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () => Navigator.pushNamed(context, '/sudoku'),
+//                   child: Text('Sudoku'),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () => Navigator.pushNamed(context, '/game'),
+//                   child: Text('Chuck Jump'),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () => Navigator.pushNamed(context, '/inviteFriend'),
+//                   child: Text('Invite Friends'),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () => Navigator.pushNamed(context, '/challenges'),
+//                   child: Text('Challenges'),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () =>
+//                       Navigator.pushNamed(context, '/acceptedChallenges'),
+//                   child: Text('Accepted Challenges'),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () =>
+//                       Navigator.pushNamed(context, '/issueChallenge'),
+//                   child: Text('Issue Challenge'),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () =>
+//                       Navigator.pushNamed(context, '/profilePage'),
+//                   child: Text('Profile Page'),
+//                 ),],),
+// ),
             
           ],
         ),

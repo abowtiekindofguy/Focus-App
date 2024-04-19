@@ -69,6 +69,11 @@ class Authentication{
     return user!.email!;
   } 
 
+  static Future<String> getName() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    return user!.displayName??"User";
+  }
+
   static Future<User?> getCurrentUser() async {
     return FirebaseAuth.instance.currentUser;
   }
@@ -176,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen>{
                                         if (user != null) {
                                           Navigator.of(context).pushAndRemoveUntil(
                                             MaterialPageRoute(
-                                              builder: (context) => HomeScreen(),
+                                              builder: (context) => HomeScreen(currentUserId: user.email,name: user.displayName,),
                                             ),
                                             ModalRoute.withName('/home'),
                                           );
@@ -341,7 +346,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   // ProfilePage(user: user),
-                                                  HomeScreen(),
+                                                  HomeScreen(currentUserId: user.email,name: user.displayName,),
                                             ),
                                             ModalRoute.withName('/'),
                                           );

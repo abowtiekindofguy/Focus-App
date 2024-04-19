@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -103,7 +104,6 @@ class InviteFriendPage extends StatelessWidget {
       Fluttertoast.showToast(
         msg: "You are your own friend already :)",
         toastLength: Toast.LENGTH_SHORT,
-        // gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 1,
         backgroundColor: Colors.black,
         textColor: Colors.white,
@@ -174,23 +174,45 @@ class FriendsPage extends StatefulWidget {
   @override
   _FriendsPageState createState() => _FriendsPageState(currentUserId: currentUserId);
 
-
-  
 }
 
 class _FriendsPageState extends State<FriendsPage> {
   final String currentUserId;
-
+  List<String> friends = [];
   _FriendsPageState({required this.currentUserId});
 
 @override
   void initState() {
     super.initState();
-    // userDataFuture = getUserData(widget.emailID);
-    // Locking the orientation to portrait mode
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+    getFriendsList();
+  }
+
+
+  void getFriendsList() async {
+    List<String> temp = [];
+    final friendsRef = FirebaseFirestore.instance.collection('friendRequests').where('senderId', isEqualTo: currentUserId).where('status', isEqualTo: 'accepted').get();
+    await friendsRef.then((QuerySnapshot querySnapshot) {
+    querySnapshot.docs.forEach((doc) {
+      temp.add(doc['receiverId']);
+    });
+  }).catchError((error) { 
+    print("Error Occured!");
+  });
+    final friendsRefReceiver = FirebaseFirestore.instance.collection('friendRequests').where('receiverId', isEqualTo: currentUserId).where('status', isEqualTo: 'accepted').get();
+    await friendsRefReceiver.then((QuerySnapshot querySnapshot) { 
+    querySnapshot.docs.forEach((doc) {
+      temp.add(doc['senderId']);
+    });
+  }).catchError((error) {
+    print("Error Occured!");
+  });
+
+    setState(() {
+      friends = temp.toSet().toList();
+    });
   }
 
 @override
@@ -206,7 +228,7 @@ class _FriendsPageState extends State<FriendsPage> {
 
   @override
 Widget build(BuildContext context) {
-  final friendsRef = FirebaseFirestore.instance.collection('users').doc(currentUserId);
+  
   
   return Scaffold(
     appBar: AppBar(
@@ -215,35 +237,50 @@ Widget build(BuildContext context) {
     body: Column(
       children: [
         InviteFriendPage(currentUserId: currentUserId,),
-        Flexible( // Wrap the StreamBuilder in an Expanded widget
-          child: StreamBuilder<DocumentSnapshot>(
-            stream: friendsRef.snapshots(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Center(child: CircularProgressIndicator());
-              }
-              var data = snapshot.data?.data() as Map<String, dynamic>?;
-              var friendsMap = data?['friends'] as Map<String, dynamic>?;
-              if (friendsMap == null || friendsMap.isEmpty) {
-                return Center(child: Text('No friends found.'));
-              }
-
-                List<String> friends = friendsMap.keys.toList();
-
-                return ListView.builder(
-                itemCount: friends.length,
-                itemBuilder: (context, index) {
-                  String friendUserId = friends[index];
-                  return ProfileCard(userID: friendUserId, height:MediaQuery.of(context).size.height/10, width: 0.4*MediaQuery.of(context).size.width, onPressed: () => Navigator.pushNamed(context, '/profile_page'));
-                  // return Padding(
-                  // padding: EdgeInsets.symmetric(vertical: 4.0),
-                  // child: ,
-                  // );
-                },
-                );
-            },
-          ),
-        ),
+ // Wrap the StreamBuilder in an Expanded widget
+           Flexible(
+             child: ListView.builder(
+                  itemCount: friends.length,
+                  itemBuilder: (context, index) {
+                    String friendUserId = friends[index];
+                    return ProfileCard(
+                      userID: friendUserId,
+                      height: MediaQuery.of(context).size.height / 10,
+                      width: 0.4 * MediaQuery.of(context).size.width,
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text(friendUserId),
+                            content: Text('Click here to unfriend this user.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  unfriend(friendUserId);
+                                  Navigator.of(context).pop();
+                                  Future.delayed(Duration.zero, () => setState(() {
+                                    friends.remove(friendUserId);
+                                  }));
+                                  Navigator.of(context).pushNamed('/friends', arguments: FriendsPage(currentUserId: currentUserId));
+                                },
+                                child: Text('Unfriend'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  // Perform any action you want when the dialog is closed
+                                  Navigator.of(context).pop();
+                                  
+                                },
+                                child: Text('Close'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  ),
+           ),
         Row(
           children: [
             ElevatedButton(
@@ -265,9 +302,15 @@ Widget build(BuildContext context) {
   );
 }
 
+ Future<void> unfriend(String friendId) async {
+    await FirebaseFirestore.instance.collection('friendRequests').where('senderId', isEqualTo: currentUserId).where('receiverId', isEqualTo: friendId).get().then((value) {
+      value.docs.forEach((element) {
+        element.reference.delete();
+      });
+    });
   }
 
-
+}
 
  class FriendRequestsPage extends StatelessWidget {
   final String currentUserId;
@@ -303,7 +346,7 @@ Widget build(BuildContext context) {
         children: [
           IconButton(
             icon: Icon(Icons.check),
-            onPressed: () => acceptFriendRequest(request.id, currentUserId, request['senderId']),
+            onPressed: () => acceptFriendRequest(request.id),
           ),
           IconButton(
             icon: Icon(Icons.close),
@@ -325,16 +368,11 @@ Widget build(BuildContext context) {
     return await FirebaseFirestore.instance.collection('users').doc(userId).get();
   }
 
-  Future<void> acceptFriendRequest(String requestId, String currentUserId, String senderId) async {
-    // Add each user to the other's friends collection
-    // await FirebaseFirestore.instance.collection('users').doc(currentUserId).collection('friends').doc(senderId).set({});
-    // await FirebaseFirestore.instance.collection('users').doc(senderId).collection('friends').doc(currentUserId).set({});
-    // Update the request status to "accepted"
+  Future<void> acceptFriendRequest(String requestId) async {
     await FirebaseFirestore.instance.collection('friendRequests').doc(requestId).update({'status': 'accepted'});
   }
 
   Future<void> declineFriendRequest(String requestId) async {
-    // Update the request status to "declined"
     await FirebaseFirestore.instance.collection('friendRequests').doc(requestId).update({'status': 'declined'});
   }
 } 

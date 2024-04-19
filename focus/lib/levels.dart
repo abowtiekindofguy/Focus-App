@@ -43,6 +43,14 @@ class _LevelsPageState extends State<LevelsPage> {
     ]);
   }
 
+  void dispose(){
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    super.dispose();
+  }
+
   void setList() async {
     List<String>? savedList = await getList();
     if (savedList != null) {
@@ -71,7 +79,9 @@ class _LevelsPageState extends State<LevelsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 18, 18, 18),
       body: GridView.count(
+        
         crossAxisCount: 4,
         scrollDirection: Axis.horizontal,
         children: List.generate(40, (index) {
@@ -79,6 +89,7 @@ class _LevelsPageState extends State<LevelsPage> {
             padding: EdgeInsets.all(4.0), // Add padding between buttons
 
                 child: ElevatedButton(
+                  
                   onPressed: () {
                     fire_speed = 3 - (index~/10)*0.5;
                     score_to_achieve = 15 + (1+index%10)*2;
@@ -104,6 +115,8 @@ class _LevelsPageState extends State<LevelsPage> {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
+                            backgroundColor: Color.fromARGB(255, 18, 18, 18),
+                 
                             title: Text('You have played 5 games today'),
                             content: Text('Please try again tomorrow'),
                             actions: <Widget>[

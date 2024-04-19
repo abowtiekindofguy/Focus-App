@@ -46,6 +46,7 @@ import 'package:open_file/open_file.dart';
 import 'package:installed_apps/installed_apps.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'appicon.dart';
+import 'notifications.dart';
 import 'package:pair/pair.dart';  
 // void main() {
 //   initializeDateFormatting().then((_) => runApp(const MyApp()));
@@ -143,7 +144,7 @@ class _ChatPageState extends State<ChatPage> {
   final String path = '$downloadsDirectory/$filename';
   final File file = File(path);
   await file.writeAsBytes(await pdf.save());
-  print("PDF saved to $path");
+  fltoast("PDF saved to $path");
 }
 
 
