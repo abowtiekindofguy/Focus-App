@@ -318,23 +318,29 @@ class _SudokuPageState extends State<SudokuPage> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255,18,18,18),
       appBar: AppBar(
+        foregroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 30, 30, 30),
         title: const Text('Sudoku Game'),
       ),
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              '${(_seconds ~/ 60).toString().padLeft(2, '0')}:${(_seconds % 60).toString().padLeft(2, '0')}',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.white,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                '${(_seconds ~/ 60).toString().padLeft(2, '0')}:${(_seconds % 60).toString().padLeft(2, '0')}',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
             Center(
               child: Container(
                 padding: const EdgeInsets.all(20),
+                margin: EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -467,6 +473,8 @@ class _SudokuPageState extends State<SudokuPage> {
                     _res = true;
                   },
                   child: Text('New Game'),
+                  style: ElevatedButton.styleFrom(
+                  ),
                 ),
                 SizedBox(width: 16),
                 FloatingActionButton(
@@ -539,62 +547,3 @@ class _SudokuPageState extends State<SudokuPage> {
     );
   }
 }
-
-
-class WordleGame extends StatefulWidget {
-  @override
-  _WordleGameState createState() => _WordleGameState();
-}
-
-class _WordleGameState extends State<WordleGame> {
-  String _guess = '';
-
-  void _makeGuess(String guess) {
-    setState(() {
-      _guess = guess;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Wordle Game'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Make a guess:',
-              style: TextStyle(fontSize: 20),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              onChanged: (value) {
-                _makeGuess(value);
-              },
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Enter your guess',
-              ),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                // TODO: Implement logic to check the guess
-              },
-              child: Text('Check'),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Your guess: $_guess',
-              style: TextStyle(fontSize: 20),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-

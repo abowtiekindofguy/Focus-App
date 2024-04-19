@@ -42,9 +42,9 @@ class AppTile extends StatelessWidget  {
   Widget build(BuildContext context) {
     return ListTile(
                    leading: Image.asset(appIcons[packageName] ?? 'assets/images/app.png'),
-            title: Text(appName[packageName] ?? 'Android App'),
-            subtitle: Text(packageName),
-            trailing: Text(text),
+            title: Text(appName[packageName] ?? 'Android App', style: TextStyle(color: Colors.white)),
+            subtitle: Text(packageName, style: TextStyle(color: Colors.white)),
+            trailing: Text(text, style: TextStyle(color: Colors.white)),
           );
   }
 }

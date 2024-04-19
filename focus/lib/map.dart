@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'profile-card.dart'; // Import the profile card widget
 
 class MapPage extends StatefulWidget {
   @override
@@ -21,6 +22,7 @@ class _MapSamplePageState extends State<MapPage> {
 
     void _showBottomSheet(BuildContext context, Map<String, String> dataMap, String locationName) {
     showModalBottomSheet(
+      backgroundColor: Color.fromARGB(255, 24, 24, 24),
       context: context,
       builder: (context) => DraggableScrollableSheet(
         expand: false,
@@ -29,10 +31,8 @@ class _MapSamplePageState extends State<MapPage> {
           itemCount: dataMap.keys.length,
           itemBuilder: (_, index) {
             String key = dataMap.keys.elementAt(index);
-            return ListTile(
-              title: Text(key),
-              trailing: Text('${dataMap[key]}'),
-            );
+            return ProfileCard(userID: dataMap[key]??"Friend",height: MediaQuery.of(context).size.height / 10,
+                      width: 0.4 * MediaQuery.of(context).size.width, onPressed: () => ());
           },
         ),
       ),

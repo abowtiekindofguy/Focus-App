@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:focus/main_chuck.dart';// Make sure this is the correct path to your game logic
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'challenge.dart';
 
 
 Future<List<String>?> getList() async{
@@ -16,6 +16,9 @@ Future<List<String>?> getList() async{
 }
 
 class LevelsPage extends StatefulWidget {
+  final String userId;
+  
+  LevelsPage({super.key, required this.userId});
   List<bool> locked = (List.generate(40, (index) => (index == 0) ? false : true)); // Default values
   // TODO: Extract list from shared preferences if present
   // Example code to extract from shared preferences:
@@ -28,7 +31,7 @@ class _LevelsPageState extends State<LevelsPage> {
   double fire_speed = 1.5;
   int score_to_achieve= 20;
   double gravity = 15;
-  int init_health = 10;
+  int init_health = 5;
   int game_tries = 0;
   @override
   void initState()  {
@@ -36,11 +39,26 @@ class _LevelsPageState extends State<LevelsPage> {
     // resetTries();
     getTries();
     setList();
+    set_init_health();
+    // final init_health = getChallengeScore(widget.userId)>0? getChallengeScore(userId): 1000;
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+  }
+
+  void set_init_health() async{
+    final score = await getChallengeScore(widget.userId);
+    if(score>0){
+      init_health = score~/10 + 5;
+    }
+    else{
+      init_health = 5;
+    }
+    setState(() {
+      init_health = init_health;
+    });
   }
 
   void dispose(){

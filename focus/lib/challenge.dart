@@ -268,10 +268,14 @@ class IssueChallenge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 18, 18, 18),
       appBar: AppBar(
-        title: const Text('Accepted Challenges'),
+        backgroundColor: Color.fromARGB(255, 18, 18, 18), 
+        foregroundColor: Colors.white,
+        title: const Text('Challenges'),
       ),
       body: SingleChildScrollView(
+        
         child: Column(
           children: [
             FutureBuilder<int>(
@@ -300,7 +304,7 @@ class IssueChallenge extends StatelessWidget {
               child: Expanded(
                 child: Text(
                   'Limit Goals',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                   textAlign: TextAlign.left,
                 ),
               ),
@@ -327,7 +331,7 @@ class IssueChallenge extends StatelessWidget {
               child: Expanded(
                 child: Text(
                   'All Active Challenges',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                   textAlign: TextAlign.left,
                 ),
               ),
@@ -455,8 +459,8 @@ class ChallengesListWidget extends StatelessWidget {
                 if (!userSnapshot.hasData) return const ListTile(title: Text('Loading user data...'));
                 var userInfo = userSnapshot.data!.data() as Map<String, dynamic>;
                 return ListTile(
-                  title: Text(userInfo['name'] ?? 'Unknown User'),
-                  subtitle: Text('Invites you to a challenge: ' + (request['challenge-name'] ?? 'Unknown Challenge')),
+                  title: Text(userInfo['name'] ?? 'Unknown User', style: TextStyle(color: Colors.white)),
+                  subtitle: Text('Invites you to a challenge: ' + (request['challenge-name'] ?? 'Unknown Challenge'), style: TextStyle(color: Colors.white)),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -487,6 +491,7 @@ class ChallengesListWidget extends StatelessWidget {
 
   void _showBottomSheet(BuildContext context, Map<String, int> dataMap, String challengeId) {
     showModalBottomSheet(
+      backgroundColor: Color.fromARGB(255, 18, 18, 18),
       context: context,
       builder: (context) => DraggableScrollableSheet(
         expand: false,

@@ -259,7 +259,10 @@ class _TrackPageState extends State<TrackPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 18, 18, 18),
       appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 18, 18, 18),
+        foregroundColor: Colors.white,
         title: Text("Activity Dashboard"),
         // backgroundColor: Colors.black,
         actions: [
@@ -287,7 +290,7 @@ class _TrackPageState extends State<TrackPage> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 'Screen Time (calculated for the past 24 hours)',
-                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, ),
               ),
             ),
 
@@ -295,7 +298,7 @@ class _TrackPageState extends State<TrackPage> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 totalUsageInHoursandMinutes(info),
-                style: TextStyle(color: Colors.black, fontSize: 36),
+                style: TextStyle(color: Colors.white, fontSize: 36),
               ),
             ),
             ListView.builder(
@@ -311,7 +314,7 @@ class _TrackPageState extends State<TrackPage> {
                 Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                "Loading suggestions from the Focus Bot tailored for you...",
+                "Loading suggestions from the Focus Bot tailored for you...", style: TextStyle(color: Colors.white),
               // print(suggestions);,
                 // style: TextStyle(color: Colors.white),
               ),
@@ -321,7 +324,7 @@ class _TrackPageState extends State<TrackPage> {
             )) : Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                suggestions,
+                suggestions,style: TextStyle(color: Colors.white),
               // print(suggestions);,
                 // style: TextStyle(color: Colors.white),
               ),

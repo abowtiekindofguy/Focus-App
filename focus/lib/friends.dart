@@ -67,21 +67,25 @@ class InviteFriendPage extends StatelessWidget {
       child: Column(
         children: [
           TextFormField(
+            style: TextStyle(color: Colors.white),
             controller: emailController,
             validator: (value) {
               // Implement validateEmail where necessary or ensure it is imported
               return Validator.validateEmail(email: value);
             },
             decoration: InputDecoration(
-              labelText: 'Send Friend Request. Enter your friend\'s Focus ID',
+              labelText: 'Send Friend Request with Focus ID',
+              labelStyle: TextStyle(color: Colors.white),
               suffixIcon: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
+                    color: Colors.white,
                     icon: Icon(Icons.camera_alt),
                     onPressed: () => _openQRScanner(context),
                   ),
                   IconButton(
+                    color: Colors.white,
                     icon: Icon(Icons.send),
                     onPressed: () {
                       if (emailController.text.isNotEmpty) {
@@ -166,6 +170,8 @@ class InviteFriendPage extends StatelessWidget {
   }
 }
 
+
+
 class FriendsPage extends StatefulWidget {
   final String currentUserId;
 
@@ -231,14 +237,25 @@ Widget build(BuildContext context) {
   
   
   return Scaffold(
+    backgroundColor: Color.fromARGB(255, 18, 18, 18),
     appBar: AppBar(
+      backgroundColor: Color.fromARGB(255, 18, 18, 18),
+      foregroundColor: Colors.white ,  
       title: Text('Friends'),
+      actions: [
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/friendrequests'); // Ensure this route is defined in your MaterialApp routes
+              },
+              child: Text('Friend Requests'),
+            ),
+        ],
     ),
     body: Column(
       children: [
         InviteFriendPage(currentUserId: currentUserId,),
  // Wrap the StreamBuilder in an Expanded widget
-           Flexible(
+           Expanded(
              child: ListView.builder(
                   itemCount: friends.length,
                   itemBuilder: (context, index) {
@@ -280,23 +297,23 @@ Widget build(BuildContext context) {
                     );
                   },
                   ),
-           ),
-        Row(
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/friendrequests'); // Ensure this route is defined in your MaterialApp routes
-              },
-              child: Text('Friend Requests'),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/inviteFriend'); // Ensure this route is defined in your MaterialApp routes
-              },
-              child: Text('Invite Friends'),
-            ),
-          ],
-        ),
+        //    ),        Row(
+        //   children: [
+        //     ElevatedButton(
+        //       onPressed: () {
+        //         Navigator.pushNamed(context, '/friendrequests'); // Ensure this route is defined in your MaterialApp routes
+        //       },
+        //       child: Text('Friend Requests'),
+        //     ),
+        //     ElevatedButton(
+        //       onPressed: () {
+        //         Navigator.pushNamed(context, '/inviteFriend'); // Ensure this route is defined in your MaterialApp routes
+        //       },
+        //       child: Text('Invite Friends'),
+        //     ),
+        //   ],
+        // ),
       ],
     ),
   );
@@ -317,7 +334,7 @@ Widget build(BuildContext context) {
   FriendRequestsPage({required this.currentUserId});
   @override
   Widget build(BuildContext context) {
-    final requestsRef = FirebaseFirestore.instance.collection('friendRequests').where('recieverId', isEqualTo: currentUserId).where('status', isEqualTo: 'pending');
+    final requestsRef = FirebaseFirestore.instance.collection('friendRequests').where('receiverId', isEqualTo: currentUserId).where('status', isEqualTo: 'pending');
     return Scaffold(
       appBar: AppBar(
         title: Text('Friend Requests'),

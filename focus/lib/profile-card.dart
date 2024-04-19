@@ -65,8 +65,8 @@ class ProfileCard extends StatelessWidget {
         return ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-           backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+           backgroundColor: Color.fromARGB(255, 24, 24, 24),
+            foregroundColor: Colors.white,
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             textStyle: TextStyle(fontSize: 16),
             // fixedSize: Size(width, height),

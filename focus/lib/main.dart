@@ -92,7 +92,7 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // String email = await Authentication.getEmail();
   // String name = await Authentication.getName();
-  String email = "akshat@gmail.com";
+  String email = "nrpandya4511@gmail.com";
   String name = "Akshat";
   OpenAI.apiKey = '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';
   Workmanager().initialize(
@@ -120,7 +120,7 @@ Future<void> main() async {
             FriendRequestsPage(currentUserId: email),
         '/map': (context) => MapPage(),
         '/sudoku': (context) => SudokuPage(currentUserId: email),
-        '/game': (context) => LevelsPage(),
+        '/game': (context) => LevelsPage(userId: email,),
         // '/inviteFriend': (context) => InviteFriendPage(currentUserId: email),
         '/challenges': (context) => AcceptedChallenges(currentUserId: email),
         '/acceptedChallenges': (context) => AcceptedChallenges(currentUserId: email),
@@ -128,7 +128,7 @@ Future<void> main() async {
         '/profilePage': (context) => ProfilePage(currentUserId: email),
         '/chat' :(context) => ChatPage(start_message: "babushka"),
         '/breathe': (context) => BreatheGame(),
-
+        
             },
           ),
         );
@@ -489,6 +489,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.numbers,
                     label: 'Sudoku',
                     route: '/sudoku',
+                    context: context
+                  ),
+                  _buildCard(
+                    color: Color.fromARGB(255, 30, 30, 30),
+                    icon: Icons.map,
+                    label: 'Map',
+                    route: '/map',
                     context: context
                   ),
                 ],
