@@ -73,19 +73,19 @@ Future<String> FirebaseMap(String key) async {
         .get();
 
     if (querySnapshot.docs.isEmpty) {
-      return '{}';  // Return '{}' if no documents are found
+      return '{}';  
     }
 
     for (var doc in querySnapshot.docs) {
       String p = doc['value'].toString();
-      print(p);  // This should still show the correct output in console
-      return p;  // Return the found value
+      print(p);  
+      return p;  
     }
   } catch (e) {
     print("Error fetching data: $e");
-    return '{}';  // Return '{}' in case of an error
+    return '{}';  
   }
-  return "{}";  // This is a fallback, technically unreachable
+  return "{}";  
 }
 
 void FirebaseMapSet(String key, String value) async {
@@ -97,19 +97,19 @@ void FirebaseMapSet(String key, String value) async {
         .get();
 
     if (querySnapshot.docs.isEmpty) {
-      // If no document exists with the key, create a new document
+
       await FirebaseFirestore.instance
           .collection('focus-map')
-          .doc(key) // It's crucial to specify the document ID when setting for the first time
+          .doc(key) 
           .set({'key': key, 'value': value});
     } else {
-      // If documents exist, update all matching documents
+
       for (var doc in querySnapshot.docs) {
         await doc.reference.update({'value': value});
       }
     }
   } catch (e) {
-    // Handle any errors that occur during the update process
+ 
     print("Error Occurred! $e");
   }
 }

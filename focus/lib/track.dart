@@ -215,7 +215,6 @@ class _TrackPageState extends State<TrackPage> {
     await getUsageStats();
     uploadUsageStats();
     suggestions = await getResponse("The user has following App Usage times:"+appUsageMinutes.toString()+" Exclude system apps from your analysis. Please suggest in detail 10000 words for the user in as many words as possible");
-    //suggestions = "aapke liye kuch nahi";
     setState(() {});
   }
 
@@ -231,7 +230,7 @@ class _TrackPageState extends State<TrackPage> {
   Future<void> getUsageStats() async {
     try {
       DateTime endDate = DateTime.now();
-      DateTime startDate = endDate.subtract(Duration(hours: 24));
+      DateTime startDate = endDate.subtract(const Duration(hours: 24));
       List<AppUsageInfo> infoList = await AppUsage().getAppUsage(startDate, endDate);
       setState (() {
         infoList.sort((a, b) => b.usage.inMinutes.compareTo(a.usage.inMinutes));
@@ -261,9 +260,9 @@ class _TrackPageState extends State<TrackPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 18, 18, 18),
+      backgroundColor: const Color.fromARGB(255, 18, 18, 18),
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 18, 18, 18),
+        backgroundColor:const Color.fromARGB(255, 18, 18, 18),
         foregroundColor: Colors.white,
         title: Text("Activity Dashboard"),
         // backgroundColor: Colors.black,
@@ -288,7 +287,7 @@ class _TrackPageState extends State<TrackPage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
+            const Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 'Screen Time (calculated for the past 24 hours)',
@@ -300,21 +299,21 @@ class _TrackPageState extends State<TrackPage> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 totalUsageInHoursandMinutes(info),
-                style: TextStyle(color: Colors.white, fontSize: 36),
+                style: const TextStyle(color: Colors.white, fontSize: 36),
               ),
             ),
             ListView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: min(10,info.length), // the number of items in your list
               itemBuilder: (context, index) {
                 return AppTile(packageName: info[index].packageName, text: info[index].usage.inMinutes.toString() + ' minutes');
               },
             ),
             suggestions == "Hello World!" ? Center(child: Column(
-              children: [
-                Padding(padding: const EdgeInsets.all(8.0), child: Text("Curated suggestions:", style: TextStyle(color: Colors.white, fontSize: 16))),
-                Padding(
+               children: [
+                const Padding(padding: const EdgeInsets.all(8.0), child: Text("Curated suggestions:", style: TextStyle(color: Colors.white, fontSize: 16))),
+                const Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 "Loading suggestions from the Focus Bot tailored for you...", style: TextStyle(color: Colors.white),
@@ -322,7 +321,7 @@ class _TrackPageState extends State<TrackPage> {
                 // style: TextStyle(color: Colors.white),
               ),
             ),
-                CircularProgressIndicator(),
+               const CircularProgressIndicator(),
               ],
             )) : Padding(
               padding: const EdgeInsets.all(8.0),

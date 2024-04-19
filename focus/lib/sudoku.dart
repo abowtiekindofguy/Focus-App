@@ -1,9 +1,7 @@
-import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:math';
-import 'update_game.dart';
 import 'package:flutter/services.dart';
 import 'firebase_map.dart';
 

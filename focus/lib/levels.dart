@@ -1,28 +1,23 @@
-import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:focus/main_chuck.dart';// Make sure this is the correct path to your game logic
 import 'package:shared_preferences/shared_preferences.dart';
 import 'challenge.dart';
+import 'firebase_map.dart';
 
 
 Future<List<String>?> getList() async{
   SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? savedList = prefs.getStringList('locked');
     return savedList;
-    // if (savedList != null) {
-    //   widget.locked = savedList.map((e) => e == 'true').toList();
-    // }
 }
 
 class LevelsPage extends StatefulWidget {
   final String userId;
   
   LevelsPage({super.key, required this.userId});
-  List<bool> locked = (List.generate(40, (index) => (index == 0) ? false : true)); // Default values
-  // TODO: Extract list from shared preferences if present
-  // Example code to extract from shared preferences:
-  
+  List<bool> locked = (List.generate(40, (index) => (index == 0) ? false : true)); 
+
   @override
   _LevelsPageState createState() => _LevelsPageState();
 }
@@ -35,17 +30,21 @@ class _LevelsPageState extends State<LevelsPage> {
   int game_tries = 0;
   @override
   void initState()  {
-    // resetList();
-    // resetTries();
     getTries();
     setList();
     set_init_health();
-    // final init_health = getChallengeScore(widget.userId)>0? getChallengeScore(userId): 1000;
+    updateScore();
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+  }
+
+  void updateScore() async{
+    List<bool> lockedLevels = widget.locked;
+    int score = lockedLevels.where((element) => element == false).length;
+    FirebaseMapSet(widget.userId+"chuckGameScore", score.toString());
   }
 
   void set_init_health() async{
@@ -104,7 +103,7 @@ class _LevelsPageState extends State<LevelsPage> {
         scrollDirection: Axis.horizontal,
         children: List.generate(40, (index) {
           return Padding(
-            padding: EdgeInsets.all(4.0), // Add padding between buttons
+            padding: EdgeInsets.all(4.0),
 
                 child: ElevatedButton(
                   
@@ -154,14 +153,14 @@ class _LevelsPageState extends State<LevelsPage> {
                     shape : RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
-                    minimumSize: Size(100, 70), // Increase the button width to 120
+                    minimumSize: Size(100, 70), 
                   ),
                   child: (widget.locked[index])? Icon(Icons.lock) :Text('Level ${index + 1}'),
                 ),
             
           
           );
-        }), // Make the buttons scrollable in the cross axis
+        }), 
       ),
     );
   }

@@ -21,14 +21,14 @@ class GameScreen extends StatefulWidget {
     required this.lvl,
     required this.lvls,
   });
-
+  
   @override
   _GameScreenState createState() => _GameScreenState();
 }
 
 class _GameScreenState extends State<GameScreen> {
   late ChuckJumpGame _game;
-
+ 
   @override
   void initState() {
     super.initState();
@@ -80,6 +80,9 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
   }
+
+  
+
 
   @override
   Widget build(BuildContext context) {
