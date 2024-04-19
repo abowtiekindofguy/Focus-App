@@ -336,7 +336,10 @@ Widget build(BuildContext context) {
   Widget build(BuildContext context) {
     final requestsRef = FirebaseFirestore.instance.collection('friendRequests').where('receiverId', isEqualTo: currentUserId).where('status', isEqualTo: 'pending');
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 18, 18, 18),
       appBar: AppBar(
+              backgroundColor: Color.fromARGB(255, 18, 18, 18),
+              foregroundColor: Colors.white ,
         title: Text('Friend Requests'),
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -356,18 +359,19 @@ Widget build(BuildContext context) {
     if (!userSnapshot.hasData) return ListTile(title: Text('Loading...'));
     var userInfo = userSnapshot.data?.data() as Map<String, dynamic>?;
     return ListTile(
-      title: Text(userInfo?['name'] ?? 'Unknown'), // Use null-aware operators to handle possible nulls
-      subtitle: Text('Wants to be friends'),
+      title: Text(userInfo?['name'] ?? 'Unknown', style: TextStyle(color:Colors.white),), // Use null-aware operators to handle possible nulls
+      subtitle: Text('Wants to be friends', style: TextStyle(color:Colors.white),),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            icon: Icon(Icons.check),
+            icon: Icon(Icons.check, color: Colors.white),
             onPressed: () => acceptFriendRequest(request.id),
-          ),
+            ),
           IconButton(
-            icon: Icon(Icons.close),
+            icon: Icon(Icons.close, color: Colors.white),
             onPressed: () => declineFriendRequest(request.id),
+
           ),
         ],
       ),
