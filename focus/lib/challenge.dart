@@ -202,56 +202,73 @@ class IssueChallenge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 18, 18, 18),
       appBar: AppBar(
         title: Text('Issue Challenge'),
+        backgroundColor:  Color.fromARGB(255, 18, 18, 18),
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            TextFormField(
-              controller: _challengeNameController,
-              decoration: InputDecoration(
-                labelText: 'Challenge Name',
-              ),
-              validator: (value) => Validator.validateTextInput(),
-            ),
-            TextFormField(
-              controller: _challengeDescriptionController,
-              decoration: InputDecoration(
-                labelText: 'Challenge Description',
-              ),
-              validator: (value) => Validator.validateTextInput(),
-            ),
-            TextFormField(
-              controller: _challengeDurationController,
-              decoration: InputDecoration(
-                labelText: 'Challenge Duration (in minutes)',
-              ),
-              validator: _validateDuration,
-            ),
-            for (var app in _appControllers.keys)
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            children: [
               TextFormField(
-                controller: _appControllers[app],
+                controller: _challengeNameController,
+                style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  labelText: '${app.split('.').last} Duration (in minutes)',
+                  labelStyle: TextStyle(color: Colors.white),
+                  labelText: 'Challenge Name',
                 ),
-                validator: _validateAppDuration,
+                validator: (value) => Validator.validateTextInput(),
               ),
-            ElevatedButton(
-              onPressed: () async {
-                if (Form.of(context)!.validate()) {
-                  Map<String, int> challenge = {
-                    'com.whatsapp': int.tryParse(_appControllers['com.whatsapp']!.text) ?? 0,
-                    'com.google.android.youtube': int.tryParse(_appControllers['com.google.android.youtube']!.text) ?? 0,
-                    'com.instagram.android': int.tryParse(_appControllers['com.instagram.android']!.text) ?? 0,
-                  };
-                  await issueChallenge(_challengeNameController.text, challenge, currentUserId);
-                  Navigator.of(context).pop();
-                }
-              },
-              child: Text('Issue Challenge'),
-            ),
-          ],
+              TextFormField(
+                controller: _challengeDescriptionController,
+                style: TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Challenge Description',
+                  labelStyle: TextStyle(color: Colors.white),
+                ),
+                validator: (value) => Validator.validateTextInput(),
+              ),
+              TextFormField(
+                controller: _challengeDurationController,
+                              style: TextStyle(color: Colors.white),
+          
+                decoration: InputDecoration(
+                  labelText: 'Challenge Duration (in minutes)',
+                  labelStyle: TextStyle(color: Colors.white),
+                ),
+                validator: _validateDuration,
+              ),
+              for (var app in _appControllers.keys)
+                TextFormField(
+                  controller: _appControllers[app],
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: '${app.split('.').last} Duration (in minutes)',
+                    labelStyle: TextStyle(color: Colors.white),
+                  ),
+                  validator: _validateAppDuration,
+                ),
+                const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  if (Form.of(context)!.validate()) {
+                    Map<String, int> challenge = {
+                      'com.whatsapp': int.tryParse(_appControllers['com.whatsapp']!.text) ?? 0,
+                      'com.google.android.youtube': int.tryParse(_appControllers['com.google.android.youtube']!.text) ?? 0,
+                      'com.instagram.android': int.tryParse(_appControllers['com.instagram.android']!.text) ?? 0,
+                    };
+                    await issueChallenge(_challengeNameController.text, challenge, currentUserId);
+                    Navigator.of(context).pop();
+                  }
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(255, 24, 24, 24), foregroundColor: Colors.white),
+                child: Text('Issue Challenge'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -273,6 +290,13 @@ class IssueChallenge extends StatelessWidget {
         backgroundColor: Color.fromARGB(255, 18, 18, 18), 
         foregroundColor: Colors.white,
         title: const Text('Challenges'),
+        actions: [ElevatedButton(
+            style: ElevatedButton.styleFrom( backgroundColor: Color.fromARGB(255, 24, 24, 24), foregroundColor: Colors.white),
+              onPressed: () {
+                Navigator.pushNamed(context, '/issueChallenge'); // Ensure this route is defined in your MaterialApp routes
+              },
+              child: Text('Issue Challenge'),
+            ),],
       ),
       body: SingleChildScrollView(
         

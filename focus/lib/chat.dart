@@ -246,7 +246,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Color.fromARGB(255, 18, 18, 18),
+      backgroundColor: Color.fromARGB(255, 18, 18, 18),
       appBar: AppBar(
                 foregroundColor: Colors.white,
 
@@ -268,7 +268,7 @@ class _ChatPageState extends State<ChatPage> {
               children: [
                 Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Text('Loading curated suggestions for you..'),
+                child: Text('Loading curated suggestions for you..', style: TextStyle(color: Colors.white),),
                 ),
                 CircularProgressIndicator(),
               ],
