@@ -57,27 +57,6 @@ class _MapSamplePageState extends State<MapPage> {
       onTap: () {
         _showBottomSheet(context, emailList, markerLoc);
       },
-//       onTap: () {
-//         // Here you can fetch and show users near this marker
-//  showDialog(
-//         context: context,
-//         builder: (BuildContext context) {
-//           // Here, we are using a simple dialog to show user info. You can customize it as needed.
-//           return AlertDialog(
-//             title: Text("Freinds near $markerLoc"),
-//             content: Text("Users close to this marker: [...]"), // Placeholder for user info
-//             actions: <Widget>[
-//               // Usually buttons at the bottom of the dialog
-//               TextButton(
-//                 child: Text("Close"),
-//                 onPressed: () {
-//                   Navigator.of(context).pop(); // Dismiss the dialog
-//                 },
-//               ),
-//             ],
-//           );
-//         },
-//       );      },
     );
 
     setState(() {

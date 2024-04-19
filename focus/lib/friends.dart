@@ -244,6 +244,7 @@ Widget build(BuildContext context) {
       title: Text('Friends'),
       actions: [
           ElevatedButton(
+            style: ElevatedButton.styleFrom( backgroundColor: Color.fromARGB(255, 24, 24, 24), foregroundColor: Colors.white),
               onPressed: () {
                 Navigator.pushNamed(context, '/friendrequests'); // Ensure this route is defined in your MaterialApp routes
               },

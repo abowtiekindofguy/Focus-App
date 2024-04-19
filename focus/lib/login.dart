@@ -109,7 +109,10 @@ class _LoginScreenState extends State<LoginScreen>{
         _focusPassword.unfocus();
       },
       child: Scaffold(
+        backgroundColor: Color.fromARGB(255, 18, 18, 18),
         appBar: AppBar(
+                  backgroundColor: Color.fromARGB(255, 18, 18, 18),
+        foregroundColor: Colors.white,  
           title: Text('Login'),
         ),
         body: Padding(
@@ -124,12 +127,14 @@ class _LoginScreenState extends State<LoginScreen>{
                     children: <Widget>[
                       TextFormField(
                         controller: _emailTextController,
+                        style: TextStyle(color: Colors.white),
                         focusNode: _focusEmail,
                         validator: (value) => Validator.validateEmail(
                           email: value,
                         ),
                         decoration: InputDecoration(
                           hintText: "Email",
+                          hintStyle: TextStyle(color: Colors.white),
                           errorBorder: UnderlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
                             borderSide: BorderSide(
@@ -142,12 +147,14 @@ class _LoginScreenState extends State<LoginScreen>{
                       TextFormField(
                         controller: _passwordTextController,
                         focusNode: _focusPassword,
+                        style: TextStyle(color: Colors.white),
                         obscureText: true,
                         validator: (value) => Validator.validatePassword(
                           password: value,
                         ),
                         decoration: InputDecoration(
                           hintText: "Password",
+                          hintStyle: TextStyle(color: Colors.white),
                           errorBorder: UnderlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
                             borderSide: BorderSide(
@@ -163,6 +170,10 @@ class _LoginScreenState extends State<LoginScreen>{
                               children: [
                                 Expanded(
                                   child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor: MaterialStateProperty.all<Color>(Color.fromARGB(255, 24, 24, 24)),
+                                      foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                                    ),
                                     onPressed: () async {
                                       setState(() {
                                         _isProcessing = true;
@@ -198,6 +209,10 @@ class _LoginScreenState extends State<LoginScreen>{
                                 SizedBox(width: 24.0),
                                 Expanded(
                                   child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor: MaterialStateProperty.all<Color>(Color.fromARGB(255, 24, 24, 24)),
+                                      foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                                    ),
                                     onPressed: () {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
@@ -254,7 +269,10 @@ class _RegisterPageState extends State<RegisterPage> {
         _focusPassword.unfocus();
       },
       child: Scaffold(
+        backgroundColor: Color.fromARGB(255, 18, 18, 18),
         appBar: AppBar(
+          backgroundColor: Color.fromARGB(255, 18, 18, 18),
+        foregroundColor: Colors.white,
           title: Text('Register'),
         ),
         body: Padding(
@@ -268,13 +286,17 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Column(
                     children: <Widget>[
                       TextFormField(
+                        style: TextStyle(color: Colors.white),
                         controller: _nameTextController,
+
                         focusNode: _focusName,
                         validator: (value) => Validator.validateName(
                           name: value,
                         ),
                         decoration: InputDecoration(
                           hintText: "Name",
+                          hintStyle: TextStyle(color: Colors.white),
+
                           errorBorder: UnderlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
                             borderSide: BorderSide(
@@ -287,11 +309,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       TextFormField(
                         controller: _emailTextController,
                         focusNode: _focusEmail,
+                        style: TextStyle(color: Colors.white) ,
                         validator: (value) => Validator.validateEmail(
                           email: value,
                         ),
                         decoration: InputDecoration(
                           hintText: "Email",
+                          hintStyle: TextStyle(color: Colors.white),
                           errorBorder: UnderlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
                             borderSide: BorderSide(
@@ -304,12 +328,15 @@ class _RegisterPageState extends State<RegisterPage> {
                       TextFormField(
                         controller: _passwordTextController,
                         focusNode: _focusPassword,
+                        style: TextStyle(color: Colors.white) ,
                         obscureText: true,
                         validator: (value) => Validator.validatePassword(
                           password: value,
                         ),
                         decoration: InputDecoration(
                           hintText: "Password",
+                                                    hintStyle: TextStyle(color: Colors.white),
+
                           errorBorder: UnderlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
                             borderSide: BorderSide(
@@ -325,6 +352,10 @@ class _RegisterPageState extends State<RegisterPage> {
                               children: [
                                 Expanded(
                                   child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color.fromARGB(255, 24, 24, 24),
+                                      foregroundColor: Colors.white,
+                                    ),
                                     onPressed: () async {
                                       setState(() {
                                         _isProcessing = true;
