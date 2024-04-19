@@ -11,7 +11,7 @@ import 'notif.dart';
 
 class LogoEnemy extends SpriteAnimationComponent
     with HasGameReference<ChuckJumpGame> {
-  List<Vector2> img_sizes = [Vector2.all(256), Vector2.all(360), Vector2(728, 559)];
+  List<Vector2> img_sizes = [Vector2.all(256), Vector2.all(1000), Vector2.all(512)];
   List<String> img_names = ['instagram_icon.png', 'whatsapp_icon.png', 'youtube_icon.png'];
   final Vector2 gridPosition;
   double xOffset;
