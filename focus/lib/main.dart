@@ -90,10 +90,9 @@ void callbackDispatcher() {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // String email = await Authentication.getEmail();
-  // String name = await Authentication.getName();
-  String email = "nrpandya4511@gmail.com";
-  String name = "Akshat";
+  
+  String email = await Authentication.getEmail();
+  String name = await Authentication.getName();
   OpenAI.apiKey = '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';
   Workmanager().initialize(
     callbackDispatcher, // The top-level function, aka callbackDispatcher
@@ -120,7 +119,7 @@ Future<void> main() async {
             FriendRequestsPage(currentUserId: email),
         '/map': (context) => MapPage(),
         '/sudoku': (context) => SudokuPage(currentUserId: email),
-        '/game': (context) => LevelsPage(userId: email,),
+        '/game': (context) => LevelsPage(userId: email),
         // '/inviteFriend': (context) => InviteFriendPage(currentUserId: email),
         '/challenges': (context) => AcceptedChallenges(currentUserId: email),
         '/acceptedChallenges': (context) => AcceptedChallenges(currentUserId: email),
@@ -133,81 +132,6 @@ Future<void> main() async {
           ),
         );
       }
-//           0.75,
-//           1.0,
-//         ],
-//       ),
-//       boxShadow: [
-//         BoxShadow(
-//           color: color.withOpacity(0.5),
-//           offset: Offset(0, 8),
-//           blurRadius: 12,
-//         ),
-//       ],
-//     ),
-//     child: Column(
-//       mainAxisAlignment: MainAxisAlignment.center,
-//       children: <Widget>[
-//         Icon(
-//           icon,
-//           size: 40,
-//           color: Colors.white,
-//         ),
-//         SizedBox(height: 8),
-//         Text(
-//           label,
-//           style: TextStyle(
-//             color: Colors.white,
-//             fontSize: 16,
-//           ),
-//         ),
-//       ],
-//     ),
-//   );
-// }
-
-// Widget _buildCard({required Color color, required IconData icon, required String label}) {
-//   return Container(
-//     decoration: BoxDecoration(
-//       color: color,
-//       borderRadius: BorderRadius.circular(20),
-//       boxShadow: [
-//         // Dark shadow on the bottom right
-//         BoxShadow(
-//           color: Colors.black.withOpacity(0.2),
-//           offset: Offset(4, 4),
-//           blurRadius: 8,
-//           spreadRadius: 2,
-//         ),
-//         // Light shadow on the top left for a lifted edge illusion
-//         BoxShadow(
-//           color: Colors.white.withOpacity(0.7),
-//           offset: Offset(-4, -4),
-//           blurRadius: 8,
-//           spreadRadius: 2,
-//         ),
-//       ],
-//     ),
-//     child: Column(
-//       mainAxisAlignment: MainAxisAlignment.center,
-//       children: <Widget>[
-//         Icon(
-//           icon,
-//           size: 40,
-//           color: Colors.white,
-//         ),
-//         SizedBox(height: 8),
-//         Text(
-//           label,
-//           style: TextStyle(
-//             color: Colors.white,
-//             fontSize: 16,
-//           ),
-//         ),
-//       ],
-//     ),
-//   );
-// }
 
 Widget _buildCard({
   required Color color, 
@@ -219,12 +143,6 @@ Widget _buildCard({
   return GestureDetector(
     onTap: () {
       Navigator.pushNamed(context, route);
-      // // Pushing a new route
-      // Navigator.of(context).push(
-      //   MaterialPageRoute(
-      //     builder: (context) => , // Replace with your new page class
-      //   ),
-      // );
     },
     child: Container(
       decoration: BoxDecoration(

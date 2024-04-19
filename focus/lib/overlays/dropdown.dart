@@ -35,7 +35,7 @@ class _DropdownState extends State<DropdownOverlay>{
         children: [
           Padding(padding: const EdgeInsets.all(8.0),
             child: Text(
-              "Breathe",
+              "Breathe",style: TextStyle(color:Colors.white, fontSize: 20),
             ),
           ),
           ElevatedButton(
@@ -43,14 +43,17 @@ class _DropdownState extends State<DropdownOverlay>{
               widget.chuck_breathe.overlays.remove('dropdown');
               widget.chuck_breathe.reset();
             }, 
-            child: Text("Start")
+            child: Text("Start", style: TextStyle(color:Colors.white),),
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Color.fromARGB(255, 24, 24, 24)),
+            ),
           ),
           Stack(
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  "Inhale Time",
+                  "Inhale Time", style: TextStyle(color:Colors.white),
                 ),
               ),
               Container(
@@ -80,7 +83,7 @@ class _DropdownState extends State<DropdownOverlay>{
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  "Hold Up Time",
+                  "Hold Up Time",style: TextStyle(color:Colors.white),
                 ),
               ),
               Container(
@@ -110,7 +113,7 @@ class _DropdownState extends State<DropdownOverlay>{
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  "Exhale Time",
+                  "Exhale Time",style: TextStyle(color:Colors.white),
                 ),
               ),
               Container(
@@ -140,7 +143,7 @@ class _DropdownState extends State<DropdownOverlay>{
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  "Hold Up Time",
+                  "Hold Up Time",style: TextStyle(color:Colors.white),
                 ),
               ),
               Container(

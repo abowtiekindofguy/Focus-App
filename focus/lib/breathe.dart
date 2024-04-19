@@ -31,7 +31,7 @@ class ChuckBreathe extends FlameGame{
 
   @override
   Color backgroundColor() {
-    return const Color.fromARGB(255, 173, 223, 247);
+    return const Color.fromARGB(255, 18, 18, 18);
   }
   void initializeBreathe(bool start){
     _chuck= Chuck(
