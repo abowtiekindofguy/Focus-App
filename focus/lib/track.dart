@@ -313,6 +313,7 @@ class _TrackPageState extends State<TrackPage> {
             ),
             suggestions == "Hello World!" ? Center(child: Column(
               children: [
+                Padding(padding: const EdgeInsets.all(8.0), child: Text("Curated suggestions:", style: TextStyle(color: Colors.white, fontSize: 16))),
                 Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
