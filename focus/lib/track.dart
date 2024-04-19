@@ -273,11 +273,11 @@ class _TrackPageState extends State<TrackPage> {
               createUsagePDF(info, "focus_screen_time_report.pdf", suggestions);
             },
           ),
-          IconButton(
-            icon: Icon(Icons.share),
-            onPressed: () async {
-            },
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.share),
+          //   onPressed: () async {
+          //   },
+          // ),
         ],
       ),
       // backgroundColor: Colors.black,
